@@ -1,0 +1,77 @@
+---
+/*
+ * One of Cherry's toys, lying on the grass. An SVG group (<g>), drawn
+ * around (0, 0) = where it touches the ground. Place it inside an <svg>.
+ * `rotate` tilts it so the toys look dropped, not lined up.
+ */
+interface Props {
+  kind: 'ball' | 'bone' | 'rope' | 'ring';
+  x: number;
+  y: number;
+  rotate?: number;
+  scale?: number;
+}
+
+const { kind, x, y, rotate = 0, scale = 1.5 } = Astro.props;
+---
+
+<g class="toy" transform={`translate(${x} ${y}) scale(${scale})`}>
+  <ellipse class="shadow" cx="0" cy="0" rx="13" ry="3" />
+  <g transform={`rotate(${rotate})`}>
+    {kind === 'ball' && (
+      <>
+        <circle class="ball" cx="0" cy="-8" r="8" />
+        {/* The curved seam of a tennis ball */}
+        <path class="seam" d="M-6 -13 Q0 -8 -6 -3" />
+        <path class="seam" d="M6 -13 Q0 -8 6 -3" />
+      </>
+    )}
+
+    {kind === 'bone' && (
+      <>
+        {/* Two knobbly ends (two circles each) joined by a bar */}
+        <rect class="bone" x="-11" y="-8" width="22" height="6" rx="3" />
+        <circle class="bone" cx="-12" cy="-8" r="4" />
+        <circle class="bone" cx="-12" cy="-2" r="4" />
+        <circle class="bone" cx="12" cy="-8" r="4" />
+        <circle class="bone" cx="12" cy="-2" r="4" />
+      </>
+    )}
+
+    {kind === 'rope' && (
+      <>
+        {/* A striped rope with a knot at each end */}
+        <rect class="rope" x="-12" y="-7" width="24" height="6" rx="3" />
+        <rect class="rope-stripe" x="-6" y="-7" width="4" height="6" />
+        <rect class="rope-stripe" x="2" y="-7" width="4" height="6" />
+        <circle class="knot" cx="-13" cy="-4" r="4.5" />
+        <circle class="knot" cx="13" cy="-4" r="4.5" />
+      </>
+    )}
+
+    {kind === 'ring' && (
+      /* A squeaky ring: a circle with a thick stroke and no fill */
+      <ellipse class="ring" cx="0" cy="-4" rx="10" ry="4.5" />
+    )}
+  </g>
+</g>
+
+<style>
+  .shadow { fill: var(--color-grass-dark); opacity: 0.6; }
+  .ball { fill: var(--color-accent); }
+  .seam {
+    fill: none;
+    stroke: var(--color-fur);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+  .bone { fill: var(--color-wall); }
+  .rope { fill: var(--color-recordshop); }
+  .rope-stripe { fill: var(--color-wall); }
+  .knot { fill: var(--color-recordshop-dark); }
+  .ring {
+    fill: none;
+    stroke: var(--color-workshop);
+    stroke-width: 4;
+  }
+</style>

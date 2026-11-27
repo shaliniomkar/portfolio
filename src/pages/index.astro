@@ -1,12 +1,14 @@
 ---
 /*
- * Placeholder home page for Phase 0. It only proves that the tokens,
- * fonts and deploy work. The island scene replaces it in Phase 1.
+ * Home page. Phase 1 adds the island scene; the speech bubble below is
+ * still a placeholder until Phase 2 makes the buildings clickable.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Island from '../components/Island.astro';
 ---
 
 <BaseLayout title="Shalini's Island">
+  <Island />
   <main class="placeholder">
     <div class="bubble">
       <span class="tab">Coming soon</span>
@@ -21,9 +23,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   /* Styles in an .astro file only apply to this page (Astro scopes them). */
   .placeholder {
     display: grid;
-    place-items: center; /* centres the bubble both ways */
-    min-height: 100vh;
-    padding: var(--space-4);
+    place-items: center; /* centres the bubble horizontally */
+    padding: var(--space-6) var(--space-4);
   }
 
   .bubble {

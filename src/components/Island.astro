@@ -1,0 +1,200 @@
+---
+/*
+ * The island scene at the top of the home page: one inline SVG.
+ *
+ * Why one SVG? It scales like an image: every shape grows and shrinks
+ * together, so the houses never drift off the grass at different screen
+ * sizes. And because it's inline (not an <img>), CSS variables from
+ * tokens.css can colour it, and Phase 2 can make the buildings clickable.
+ *
+ * Coordinates use a 1440 × 620 "viewBox": a made-up grid that matches the
+ * mockup at 1440 px wide. The browser scales that grid to the real size.
+ * SVG draws in order, so later shapes sit on top of earlier ones.
+ */
+import Building from './Building.astro';
+import Dog from './Dog.astro';
+import DogToy from './DogToy.astro';
+---
+
+<div class="scene-scroll" tabindex="0" aria-label="Island scene (scrolls sideways on small screens)">
+  <svg class="scene" viewBox="0 0 1440 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="island-title">
+    <title id="island-title">
+      A small pastel island with a Workshop, a Gallery, a Record Shop and a Lookout lighthouse, and Cherry the dog
+    </title>
+
+    {/* 1. Sky fills everything; the rest is painted over it */}
+    <rect class="sky" width="1440" height="620" />
+
+    {/* 2. Clouds: each is two overlapping pill shapes (rects with big rounded corners) */}
+    <g class="cloud cloud-left">
+      <rect x="143" y="125" width="150" height="44" rx="22" />
+      <rect x="188" y="106" width="140" height="36" rx="18" />
+    </g>
+    <g class="cloud cloud-right">
+      <rect x="894" y="92" width="120" height="36" rx="18" />
+      <rect x="928" y="80" width="110" height="28" rx="14" />
+    </g>
+
+    {/* 3. Sea, with one lighter wave line */}
+    <rect class="sea" y="390" width="1440" height="230" />
+    <rect class="sea-light" y="414" width="1440" height="6" />
+
+    {/* 4. Island, back to front: sand, dark grass edge, grass.
+           Each is a curved band. The top edge uses "C" (a cubic curve with
+           two control points) so the island is flat and wide on top and
+           only drops off near the edges: every building sits on grass.
+           The bottom edge uses "Q" (one control point) for a simple bulge. */}
+    <path class="sand" d="M0 476 C200 388 1240 388 1440 476 V540 Q720 612 0 540 Z" />
+    <path class="grass-dark" d="M0 488 C200 400 1240 400 1440 488 V528 Q720 580 0 528 Z" />
+    <path class="grass" d="M0 488 C200 400 1240 400 1440 488 V514 Q720 562 0 514 Z" />
+
+    {/* 5. Sandy path from the front of the island */}
+    <path class="path" d="M640 548 V490 Q640 455 698 455 Q756 455 756 490 V548 Z" />
+
+    {/* 6. Trees: trunk, a darker circle for shade, then the canopy slightly up-left */}
+    <g class="tree">
+      <rect class="trunk" x="343" y="436" width="16" height="34" rx="6" />
+      <circle class="canopy-dark" cx="355" cy="404" r="35" />
+      <circle class="canopy" cx="349" cy="400" r="33" />
+    </g>
+    <g class="tree">
+      <rect class="trunk" x="1014" y="440" width="14" height="30" rx="6" />
+      <circle class="canopy-dark" cx="1023" cy="416" r="29" />
+      <circle class="canopy" cx="1019" cy="412" r="27" />
+    </g>
+
+    {/* 7. Buildings: same component, different props */}
+    <Building
+      name="Workshop"
+      x={200}
+      roof="var(--color-workshop)"
+      roofDark="var(--color-workshop-dark)"
+    />
+    <Building
+      name="Gallery"
+      x={513}
+      roof="var(--color-gallery)"
+      roofDark="var(--color-gallery-dark)"
+      door="var(--color-gallery-dark)"
+      windows={['var(--color-recordshop)', 'var(--color-lookout)']}
+    />
+    <Building
+      name="Record Shop"
+      x={820}
+      roof="var(--color-recordshop)"
+      roofDark="var(--color-recordshop-dark)"
+      door="var(--color-recordshop-dark)"
+      windows={['var(--color-sky)']}
+      vinyl
+    />
+    <Building
+      name="Lookout"
+      x={1152}
+      kind="lighthouse"
+      roof="var(--color-recordshop)"
+      roofDark="var(--color-recordshop-dark)"
+    />
+
+    {/* 8. Cherry's toys, scattered on the grass in front of the buildings */}
+    <DogToy kind="ball" x={330} y={490} />
+    <DogToy kind="bone" x={590} y={486} rotate={-12} />
+    <DogToy kind="rope" x={930} y={488} rotate={8} />
+    <DogToy kind="ring" x={1060} y={482} />
+    <DogToy kind="ball" x={1255} y={474} />
+
+
+    {/* 9. Cherry trots back and forth along the front of the island.
+           The outer <g> does the moving (see .walker below); Dog itself
+           only swings her legs. */}
+    <g class="walker">
+      <Dog scale={1.1} walking />
+    </g>
+  </svg>
+</div>
+
+<style>
+  /*
+   * On wide screens the scene simply fills the width.
+   * On narrow screens it would get too tiny to read, so it keeps a minimum
+   * width and this wrapper scrolls sideways instead. `overflow-x: auto`
+   * keeps the scrolling inside this box, so the rest of the page never
+   * gets wider than the screen.
+   */
+  .scene-scroll {
+    overflow-x: auto;
+    overscroll-behavior-x: contain; /* a sideways swipe here won't trigger "back" */
+    background: var(--color-sky);
+  }
+
+  /* tabindex="0" lets keyboard users focus the box and scroll it with arrow keys */
+  .scene-scroll:focus-visible {
+    outline-offset: -4px;
+  }
+
+  .scene {
+    display: block; /* removes the small gap under inline elements */
+    width: 100%;
+    min-width: 960px;
+    height: auto;
+  }
+
+  .sky { fill: var(--color-sky); }
+  .cloud { fill: var(--color-cloud); }
+  .sea { fill: var(--color-sea); }
+  .sea-light { fill: var(--color-sea-light); }
+  .sand { fill: var(--color-sand); }
+  .grass-dark { fill: var(--color-grass-dark); }
+  .grass { fill: var(--color-grass); }
+  .path { fill: var(--color-path); }
+  .trunk { fill: var(--color-wood); }
+  .canopy-dark { fill: var(--color-tree-dark); }
+  .canopy { fill: var(--color-tree); }
+
+  /* Clouds drift slowly back and forth. People who turn on "reduce motion"
+     in their system settings don't get the animation. */
+  @media (prefers-reduced-motion: no-preference) {
+    .cloud {
+      animation: drift 14s ease-in-out infinite alternate;
+    }
+    .cloud-right {
+      animation-duration: 18s;
+    }
+  }
+
+  @keyframes drift {
+    to { transform: translateX(40px); }
+  }
+
+  /*
+   * Cherry's walk. In SVG, CSS "px" means the viewBox's units, so these
+   * numbers are positions on the 1440 × 620 grid. The y values rise and
+   * fall a little to follow the curve of the grass. At each end she
+   * pauses, then scaleX(-1) mirrors her so she faces the way she walks.
+   * With "reduce motion" on, she just stands still near the path.
+   */
+  .walker {
+    transform: translate(590px, 528px);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .walker {
+      animation: trot 30s linear infinite;
+    }
+  }
+
+  @keyframes trot {
+    0%    { transform: translate(280px, 516px) scaleX(1); }
+    10%   { transform: translate(500px, 526px) scaleX(1); }
+    22%   { transform: translate(730px, 531px) scaleX(1); }
+    34%   { transform: translate(960px, 526px) scaleX(1); }
+    44%   { transform: translate(1180px, 514px) scaleX(1); }
+    49.9% { transform: translate(1180px, 514px) scaleX(1); }
+    50%   { transform: translate(1180px, 514px) scaleX(-1); }
+    60%   { transform: translate(960px, 526px) scaleX(-1); }
+    72%   { transform: translate(730px, 531px) scaleX(-1); }
+    84%   { transform: translate(500px, 526px) scaleX(-1); }
+    94%   { transform: translate(280px, 516px) scaleX(-1); }
+    99.9% { transform: translate(280px, 516px) scaleX(-1); }
+    100%  { transform: translate(280px, 516px) scaleX(1); }
+  }
+</style>

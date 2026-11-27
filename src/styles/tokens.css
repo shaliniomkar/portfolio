@@ -16,20 +16,34 @@
   --color-accent: #ffd86b;      /* yellow pill buttons + tabs */
   --color-star: #d9a93a;        /* rating stars */
   --color-vinyl: #3a3038;       /* record disc */
+  --color-fur: #ffffff;         /* Cherry the dog */
+  --color-fur-shade: #efe6d8;
 
   /* Island scene */
   --color-sky: #bfe6f2;
+  --color-cloud: #ffffff;
   --color-sea: #6cc5d9;
+  --color-sea-light: #8ed3e3;   /* the thin wave line */
   --color-grass: #8fcb6b;
+  --color-grass-dark: #78b85a;  /* the island's shaded edge */
   --color-tree: #5fae58;
+  --color-tree-dark: #4c9547;
   --color-sand: #f6e4b5;
-  --color-wood: #a9744d;
+  --color-path: #e8d3a0;
+  --color-wood: #a9744d;        /* doors and tree trunks */
 
-  /* One colour per house, plus a pale tint for its section card */
-  --color-workshop: #6fa8dc;       --color-workshop-tint: #e4f0fb;
-  --color-gallery: #a88bd9;        --color-gallery-tint: #efe8fa;
-  --color-recordshop: #f28b6b;     --color-recordshop-tint: #fde9e2;
-  --color-lookout: #7fd1b9;        --color-lookout-tint: #e2f4ec;
+  /* Building parts shared by every house */
+  --color-wall: #fff3da;
+  --color-wall-base: #ecd9b4;
+  --color-window-frame: #c9a37a;
+  --color-window-glow: #ffe7a0;
+
+  /* One colour per house, a darker shade for roof edges,
+     and a pale tint for its section card */
+  --color-workshop: #6fa8dc;    --color-workshop-dark: #5a90c2;    --color-workshop-tint: #e4f0fb;
+  --color-gallery: #a88bd9;     --color-gallery-dark: #7a5bb5;     --color-gallery-tint: #efe8fa;
+  --color-recordshop: #f28b6b;  --color-recordshop-dark: #c9654f;  --color-recordshop-tint: #fde9e2;
+  --color-lookout: #7fd1b9;     --color-lookout-dark: #5fb39b;     --color-lookout-tint: #e2f4ec;
 
   /* Type */
   --font-heading: 'Fredoka', system-ui, sans-serif;

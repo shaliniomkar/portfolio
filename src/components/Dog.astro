@@ -1,0 +1,153 @@
+---
+/*
+ * Cherry, a little white Maltese puppy, drawn as an SVG group (<g>).
+ * Like Building.astro, she's drawn around (0, 0) = the ground between her
+ * feet, facing right. `x` / `y` move her into place. Place her inside an <svg>.
+ *
+ * Puppy proportions: a big round head, a short body, short legs and
+ * small floppy ears. That's what makes her read as a puppy, not a grown dog.
+ * Her coat is made of tufts (see below) so she looks fluffy.
+ */
+interface Props {
+  x?: number;
+  y?: number;
+  scale?: number;
+  flip?: boolean;     // face left instead of right
+  walking?: boolean;  // swing her legs
+}
+
+const { x = 0, y = 0, scale = 1, flip = false, walking = false } = Astro.props;
+const sx = flip ? -scale : scale;
+
+/*
+ * Her fluffy coat is lots of overlapping circles ("tufts"): [cx, cy, r].
+ * Each list is drawn twice: first with a thick outline, then again with
+ * no outline on top. The second pass hides the outlines where circles
+ * overlap, so only the bumpy outer edge shows, like a cloud.
+ */
+type Tuft = [number, number, number];
+
+const body: Tuft[] = [
+  [0, -18, 10],                                         // core
+  [-16, -20, 7], [-10, -25, 7], [-2, -27, 7], [6, -25, 7], [12, -20, 7], // back
+  [-17, -15, 5.5], [-8, -14, 5.5], [2, -14, 5.5], [11, -15, 5.5],        // belly fringe (high enough to show her legs)
+  [21, -21, 5.5], [17, -17, 4.5],                                         // fluffy chest
+];
+const head: Tuft[] = [
+  [19, -33, 12],                                        // core
+  [11, -42, 5], [18, -46, 5.5], [25, -43, 5],           // topknot
+  [8, -35, 5], [9, -27, 5], [27, -37, 4],               // back of head and cheeks
+  [29, -29, 5],                                         // muzzle
+];
+---
+
+<g
+  class:list={['dog', { walking }]}
+  transform={`translate(${x} ${y}) scale(${sx} ${scale})`}
+>
+  <title>Cherry the Maltese</title>
+
+  {/* Soft shadow on the grass */}
+  <ellipse class="ground-shadow" cx="2" cy="0" rx="24" ry="3.5" />
+
+  {/* Far-side legs first (slightly shaded), so the body covers their tops */}
+  <rect class="leg leg-a far" x="-15" y="-15" width="7" height="15" rx="3.5" />
+  <rect class="leg leg-b far" x="7" y="-15" width="7" height="15" rx="3.5" />
+
+  {/* Tail: a plume that curls up over her back. It's one curved line
+      drawn twice: a wider shaded stroke for the outline, then a white one. */}
+  <path class="tail-outline" d="M-13 -24 Q-26 -32 -21 -41 Q-17 -46 -12 -42" />
+  <path class="tail" d="M-13 -24 Q-26 -32 -21 -41 Q-17 -46 -12 -42" />
+
+  {/* Body: outline pass, then fill pass */}
+  <g class="fluff-outline">
+    {body.map(([cx, cy, r]) => <circle cx={cx} cy={cy} r={r} />)}
+  </g>
+  <g class="fluff-fill">
+    {body.map(([cx, cy, r]) => <circle cx={cx} cy={cy} r={r} />)}
+  </g>
+
+  {/* Near-side legs, on top of the body */}
+  <rect class="leg leg-b" x="-9" y="-15" width="7" height="15" rx="3.5" />
+  <rect class="leg leg-a" x="13" y="-15" width="7" height="15" rx="3.5" />
+
+  {/* Head: big and round for a puppy, drawn the same two-pass way */}
+  <g class="fluff-outline">
+    {head.map(([cx, cy, r]) => <circle cx={cx} cy={cy} r={r} />)}
+  </g>
+  <g class="fluff-fill">
+    {head.map(([cx, cy, r]) => <circle cx={cx} cy={cy} r={r} />)}
+  </g>
+
+  {/* Short floppy ear with a fluffy tip */}
+  <ellipse class="ear" cx="12" cy="-32" rx="4.5" ry="6.5" transform="rotate(12 12 -32)" />
+  <circle class="ear" cx="11" cy="-26" r="3.5" />
+
+  {/* Face: a big eye with a white sparkle, nose, small smile */}
+  <circle class="feature" cx="22" cy="-36" r="2.6" />
+  <circle class="sparkle" cx="22.9" cy="-36.9" r="0.9" />
+  <circle class="feature" cx="34" cy="-30" r="2.2" />
+  <path class="mouth" d="M29 -26 Q31 -24.5 33 -26" />
+</g>
+
+<style>
+  /* A soft outline keeps the white fur visible on light backgrounds. */
+  .fluff-outline {
+    fill: var(--color-fur-shade);
+    stroke: var(--color-fur-shade);
+    stroke-width: 3;
+  }
+  .fluff-fill { fill: var(--color-fur); }
+  .tail,
+  .tail-outline {
+    fill: none;
+    stroke-linecap: round; /* rounded ends instead of square ones */
+  }
+  .tail-outline { stroke: var(--color-fur-shade); stroke-width: 10; }
+  .tail { stroke: var(--color-fur); stroke-width: 7; }
+  .leg {
+    fill: var(--color-fur);
+    stroke: var(--color-fur-shade);
+    stroke-width: 1.5;
+  }
+  .leg.far { fill: var(--color-fur-shade); }
+  .ear { fill: var(--color-fur-shade); }
+  .feature { fill: var(--color-vinyl); }
+  .sparkle { fill: var(--color-fur); }
+  .mouth {
+    fill: none;
+    stroke: var(--color-vinyl);
+    stroke-width: 1.3;
+    stroke-linecap: round;
+  }
+  .ground-shadow {
+    fill: var(--color-grass-dark);
+    opacity: 0.6;
+  }
+
+  /*
+   * Walking: each leg swings from its top (the hip), like a pendulum.
+   * `transform-box: fill-box` makes "top centre" mean the top of the leg
+   * itself rather than the top of the whole SVG.
+   * Legs "a" and "b" swing in opposite directions, so diagonal pairs
+   * move together, the way a real dog trots.
+   */
+  .leg {
+    transform-box: fill-box;
+    transform-origin: 50% 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .walking .leg-a {
+      animation: step 0.35s ease-in-out infinite alternate;
+    }
+    .walking .leg-b {
+      animation: step 0.35s ease-in-out infinite alternate-reverse;
+    }
+  }
+
+  @keyframes step {
+    from { transform: rotate(-22deg); }
+    to { transform: rotate(22deg); }
+  }
+</style>

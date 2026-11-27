@@ -1,0 +1,125 @@
+---
+/*
+ * One building on the island, drawn as an SVG group (<g>).
+ * It must be placed inside Island.astro's <svg>.
+ *
+ * Every shape is drawn around (0, 0) = the middle of the building's bottom
+ * edge. `x` and `ground` then move the whole group into place, so the
+ * shapes never need to know where on the island they are.
+ */
+interface Props {
+  name: string;               // shown on the sign above it
+  x: number;                  // centre of the building, in scene units
+  ground?: number;            // y of the building's bottom edge
+  kind?: 'house' | 'lighthouse';
+  roof: string;               // CSS colour, e.g. 'var(--color-workshop)'
+  roofDark: string;           // darker edge under the roof
+  door?: string;
+  windows?: string[];         // two colours = two windows; one = one wide window
+  vinyl?: boolean;            // record on the roof (Record Shop)
+}
+
+const {
+  name,
+  x,
+  ground = 469,
+  kind = 'house',
+  roof,
+  roofDark,
+  door = 'var(--color-wood)',
+  windows = ['var(--color-window-glow)', 'var(--color-window-glow)'],
+  vinyl = false,
+} = Astro.props;
+
+// How high the sign floats above the ground for each shape.
+const signY = kind === 'lighthouse' ? -275 : vinyl ? -238 : -205;
+// Rough width so the sign fits its text (about 9 units per letter + padding).
+const signWidth = name.length * 9 + 32;
+// With one wide window, the door moves right to make room.
+const doorX = windows.length === 1 ? 50 : 0;
+---
+
+<g
+  class="building"
+  transform={`translate(${x} ${ground})`}
+  style={`--roof: ${roof}; --roof-dark: ${roofDark}; --door: ${door}`}
+>
+  {kind === 'house' ? (
+    <>
+      {/* Walls: a darker rectangle with a lighter one on top leaves a "lip" at the bottom */}
+      <rect class="wall-base" x="-86" y="-115" width="172" height="115" rx="12" />
+      <rect class="wall" x="-86" y="-115" width="172" height="107" rx="12" />
+
+      {/* Roof: a flat-bottomed dome. The dark copy sits 8 units lower and peeks out underneath. */}
+      <path class="roof-dark" d="M-100 -100 V-138 Q-100 -180 -58 -180 H58 Q100 -180 100 -138 V-100 Z" />
+      <path class="roof" d="M-100 -108 V-138 Q-100 -180 -58 -180 H58 Q100 -180 100 -138 V-108 Z" />
+
+      {windows.length === 1 ? (
+        <rect class="window" x="-72" y="-92" width="78" height="42" rx="8" style={`fill: ${windows[0]}`} />
+      ) : (
+        <>
+          <rect class="window" x="-68" y="-92" width="40" height="38" rx="7" style={`fill: ${windows[0]}`} />
+          <rect class="window" x="28" y="-92" width="40" height="38" rx="7" style={`fill: ${windows[1]}`} />
+        </>
+      )}
+
+      {/* Door: straight sides with a half-circle (arc) on top */}
+      <path class="door" d={`M${doorX - 20} -8 V-38 A20 20 0 0 1 ${doorX + 20} -38 V-8 Z`} />
+
+      {vinyl && (
+        <g class="vinyl">
+          <circle cx="0" cy="-190" r="28" class="vinyl-disc" />
+          <circle cx="0" cy="-190" r="9" class="vinyl-label" />
+        </g>
+      )}
+    </>
+  ) : (
+    <>
+      {/* Lighthouse: a tall cream tower with two coral stripes */}
+      <rect class="wall" x="-33" y="-172" width="66" height="172" />
+      <rect class="roof" x="-33" y="-138" width="66" height="34" />
+      <rect class="roof" x="-33" y="-70" width="66" height="34" />
+      <rect class="roof-dark" x="-42" y="-184" width="84" height="12" rx="6" />
+      <rect class="lamp" x="-26" y="-222" width="52" height="38" rx="4" />
+      <path class="roof" d="M-30 -220 A30 30 0 0 1 30 -220 Z" />
+    </>
+  )}
+
+  {/* The sign: a cream pill with a soft shadow, like a tiny speech bubble */}
+  <g class="sign" transform={`translate(0 ${signY})`}>
+    <rect class="sign-shadow" x={-signWidth / 2} y="-13" width={signWidth} height="30" rx="15" />
+    <rect class="sign-pill" x={-signWidth / 2} y="-17" width={signWidth} height="30" rx="15" />
+    <text class="sign-text" x="0" y="3" text-anchor="middle">{name}</text>
+  </g>
+</g>
+
+<style>
+  /* SVG shapes are coloured with `fill`. Using CSS variables here means the
+     same component draws a blue, purple or coral house depending on what
+     was passed in through `style`. */
+  .wall { fill: var(--color-wall); }
+  .wall-base { fill: var(--color-wall-base); }
+  .roof { fill: var(--roof); }
+  .roof-dark { fill: var(--roof-dark); }
+  .door { fill: var(--door); }
+  .window {
+    stroke: var(--color-window-frame);
+    stroke-width: 3;
+  }
+  .lamp {
+    fill: var(--color-window-glow);
+    stroke: var(--color-wall);
+    stroke-width: 4;
+  }
+  .vinyl-disc { fill: var(--color-vinyl); }
+  .vinyl-label { fill: var(--color-accent); }
+
+  .sign-shadow { fill: var(--color-shadow); }
+  .sign-pill { fill: var(--color-page); }
+  .sign-text {
+    fill: var(--color-text);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 15px;
+  }
+</style>
