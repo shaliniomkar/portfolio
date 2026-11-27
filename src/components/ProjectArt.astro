@@ -1,0 +1,266 @@
+---
+/*
+ * Cute clip art for a project card, drawn in SVG in the island's style:
+ * flat pastel shapes, rounded corners, and a little smiley face.
+ * `kind` picks the drawing (see src/data/projectArt.ts for the list),
+ * `tint` picks the colors.
+ *
+ * Everything is drawn on a 160 × 110 grid, so the art scales to whatever
+ * size the card gives it.
+ */
+import { tints, type ArtKind } from '../data/projectArt';
+
+interface Props {
+  kind: ArtKind;
+  tint?: keyof typeof tints;
+  label?: string; // describes the art for screen readers; empty = decorative
+}
+
+const { kind, tint = 'blue', label } = Astro.props;
+const [bg, main] = tints[tint];
+
+/** A tiny smiley face centered on (x, y). */
+const face = (x: number, y: number) => ({ x, y });
+const faces: Record<ArtKind, { x: number; y: number } | null> = {
+  chip: face(80, 57),
+  thermometer: face(80, 84),
+  cpu: null,
+  cache: face(80, 40),
+  raytrace: face(86, 66),
+  board: null,
+  music: null,
+  robot: face(80, 56),
+  claw: face(80, 74),
+  chart: null,
+  image: null,
+  cards: face(86, 58),
+  gear: null,
+};
+const f = faces[kind];
+---
+
+<svg
+  class="art"
+  viewBox="0 0 160 110"
+  style={`--bg: ${bg}; --main: ${main}`}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+>
+  <rect class="bg" width="160" height="110" rx="16" />
+  {/* soft ground shadow under every drawing */}
+  <ellipse class="shadow" cx="80" cy="96" rx="38" ry="5" />
+
+  {kind === 'chip' && (
+    <g>
+      {/* pins: small rounded bars poking out of each side */}
+      {[42, 54, 66].map((y) => <rect class="pin" x="44" y={y} width="12" height="5" rx="2.5" />)}
+      {[42, 54, 66].map((y) => <rect class="pin" x="104" y={y} width="12" height="5" rx="2.5" />)}
+      <rect class="main" x="52" y="30" width="56" height="54" rx="10" />
+      <rect class="inner" x="60" y="38" width="40" height="38" rx="6" />
+    </g>
+  )}
+
+  {kind === 'thermometer' && (
+    <g>
+      <rect class="cream" x="70" y="16" width="20" height="66" rx="10" />
+      <rect class="coral" x="75" y="42" width="10" height="44" rx="5" />
+      <circle class="coral" cx="80" cy="84" r="14" />
+      {[28, 38, 48, 58].map((y) => <path class="line" d={`M90 ${y} h7`} />)}
+    </g>
+  )}
+
+  {kind === 'cpu' && (
+    <g>
+      {[60, 72, 84, 96].map((x) => <rect class="pin" x={x} y="18" width="5" height="12" rx="2.5" />)}
+      {[60, 72, 84, 96].map((x) => <rect class="pin" x={x} y="80" width="5" height="12" rx="2.5" />)}
+      <rect class="main" x="50" y="26" width="60" height="58" rx="10" />
+      <rect class="inner" x="58" y="34" width="44" height="42" rx="6" />
+      <text class="chip-text" x="80" y="62" text-anchor="middle">CPU</text>
+    </g>
+  )}
+
+  {kind === 'cache' && (
+    <g>
+      {/* three stacked drawers, like levels of a cache */}
+      <rect class="soft" x="46" y="66" width="68" height="22" rx="7" />
+      <rect class="cream" x="50" y="46" width="60" height="22" rx="7" />
+      <rect class="main" x="54" y="26" width="52" height="24" rx="7" />
+      <rect class="handle" x="72" y="74" width="16" height="5" rx="2.5" />
+      <rect class="handle" x="72" y="54" width="16" height="5" rx="2.5" />
+    </g>
+  )}
+
+  {kind === 'raytrace' && (
+    <g>
+      {/* a little sun shining dashed light rays onto a shiny ball */}
+      <path class="ray" d="M44 32 L72 54" />
+      <path class="ray" d="M48 26 L84 44" />
+      <path class="ray" d="M40 38 L66 66" />
+      <circle class="sun" cx="38" cy="28" r="10" />
+      <circle class="main" cx="86" cy="62" r="24" />
+      <ellipse class="shine" cx="78" cy="52" rx="7" ry="4.5" transform="rotate(-30 78 52)" />
+    </g>
+  )}
+
+  {kind === 'board' && (
+    <g>
+      {/* a cork board with pinned sticky notes */}
+      <rect class="wood" x="34" y="20" width="92" height="68" rx="8" />
+      <rect class="cork" x="40" y="26" width="80" height="56" rx="5" />
+      <rect class="main" x="48" y="33" width="24" height="22" rx="3" transform="rotate(-6 60 44)" />
+      <rect class="coral" x="80" y="31" width="24" height="22" rx="3" transform="rotate(5 92 42)" />
+      <rect class="mint" x="64" y="54" width="24" height="22" rx="3" transform="rotate(-3 76 65)" />
+      <circle class="pinhead" cx="60" cy="35" r="2.5" />
+      <circle class="pinhead" cx="92" cy="33" r="2.5" />
+      <circle class="pinhead" cx="76" cy="56" r="2.5" />
+    </g>
+  )}
+
+  {kind === 'music' && (
+    <g>
+      {/* two joined music notes */}
+      <path class="stem" d="M70 74 V34 L104 26 V66" />
+      <path class="beam" d="M70 34 L104 26" />
+      <ellipse class="main" cx="62" cy="76" rx="11" ry="8.5" transform="rotate(-20 62 76)" />
+      <ellipse class="main" cx="96" cy="68" rx="11" ry="8.5" transform="rotate(-20 96 68)" />
+      <path class="sparkle" d="M118 34 l3 -8 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 Z" />
+    </g>
+  )}
+
+  {kind === 'robot' && (
+    <g>
+      <path class="line" d="M80 30 V20" />
+      <circle class="sun" cx="80" cy="18" r="5" />
+      <rect class="pin" x="46" y="46" width="10" height="18" rx="5" />
+      <rect class="pin" x="104" y="46" width="10" height="18" rx="5" />
+      <rect class="main" x="52" y="30" width="56" height="48" rx="14" />
+      <rect class="inner" x="60" y="38" width="40" height="32" rx="10" />
+    </g>
+  )}
+
+  {kind === 'claw' && (
+    <g>
+      {/* a claw machine: cabinet, glass window, claw on a cable, prize ball */}
+      <rect class="main" x="46" y="12" width="68" height="84" rx="10" />
+      <rect class="glass" x="54" y="20" width="52" height="46" rx="5" />
+      <path class="line" d="M80 20 V36" />
+      <path class="claw-arm" d="M80 36 l-8 8 l2 6 M80 36 l8 8 l-2 6" />
+      <circle class="coral" cx="70" cy="58" r="6" />
+      <circle class="sun" cx="90" cy="59" r="5.5" />
+      <rect class="cream" x="54" y="70" width="52" height="20" rx="5" />
+    </g>
+  )}
+
+  {kind === 'chart' && (
+    <g>
+      {/* a little bar chart with a trend line going up */}
+      <path class="line" d="M44 88 H120" />
+      <rect class="soft" x="52" y="62" width="14" height="26" rx="3" />
+      <rect class="main" x="72" y="48" width="14" height="40" rx="3" />
+      <rect class="soft" x="92" y="56" width="14" height="32" rx="3" />
+      <rect class="main" x="112" y="30" width="14" height="58" rx="3" transform="translate(-6 0)" />
+      <path class="trend" d="M50 52 L74 38 L94 44 L114 22" />
+      <circle class="sun" cx="114" cy="22" r="4" />
+    </g>
+  )}
+
+  {kind === 'image' && (
+    <g>
+      {/* a picture being squeezed narrower: frame, hills, sun, and arrows */}
+      <rect class="cream" x="54" y="22" width="52" height="64" rx="6" />
+      <path class="mint" d="M58 82 L72 58 L84 72 L92 62 L102 82 Z" />
+      <circle class="sun" cx="92" cy="38" r="7" />
+      <path class="arrow" d="M30 54 H46 M40 48 l6 6 l-6 6" />
+      <path class="arrow" d="M130 54 H114 M120 48 l-6 6 l6 6" />
+    </g>
+  )}
+
+  {kind === 'cards' && (
+    <g>
+      {/* two playing cards fanned out */}
+      <rect class="cream" x="52" y="26" width="40" height="56" rx="6" transform="rotate(-12 72 54)" />
+      <rect class="cream" x="68" y="28" width="40" height="56" rx="6" transform="rotate(8 88 56)" />
+      <path class="coral" d="M96 38 c-3 -5 -10 -2 -7 4 l7 7 l7 -7 c3 -6 -4 -9 -7 -4 Z" transform="rotate(8 96 42)" />
+      <path class="main" d="M56 40 l5 -7 l5 7 l-5 7 Z" transform="rotate(-12 61 40)" />
+    </g>
+  )}
+
+  {kind === 'gear' && (
+    <g>
+      {/* gear teeth: a thick dashed circle outline */}
+      <circle class="teeth" cx="80" cy="56" r="27" />
+      <circle class="main" cx="80" cy="56" r="25" />
+      <circle class="bg" cx="80" cy="56" r="9" />
+    </g>
+  )}
+
+  {f && (
+    <g class="face">
+      <circle cx={f.x - 7} cy={f.y - 2} r="2.4" />
+      <circle cx={f.x + 7} cy={f.y - 2} r="2.4" />
+      <path class="smile" d={`M${f.x - 4} ${f.y + 3} q4 4 8 0`} />
+      <circle class="blush" cx={f.x - 12} cy={f.y + 3} r="2.5" />
+      <circle class="blush" cx={f.x + 12} cy={f.y + 3} r="2.5" />
+    </g>
+  )}
+</svg>
+
+<style>
+  .art {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .bg { fill: var(--bg); }
+  .shadow { fill: var(--main); opacity: 0.18; }
+  .main { fill: var(--main); }
+  .inner { fill: var(--color-wall); opacity: 0.55; }
+  .pin { fill: var(--color-text-muted); }
+  .cream { fill: var(--color-wall); stroke: var(--color-window-frame); stroke-width: 2; }
+  .soft { fill: var(--main); opacity: 0.55; }
+  .coral { fill: var(--color-recordshop); }
+  .mint { fill: var(--color-lookout); }
+  .handle { fill: var(--color-window-frame); }
+  .wood { fill: var(--color-wood); }
+  .cork { fill: var(--color-path); }
+  .pinhead { fill: var(--color-recordshop-dark); }
+  .sun { fill: var(--color-accent); }
+  .shine { fill: var(--color-wall); opacity: 0.8; }
+  .sparkle { fill: var(--color-accent); }
+  .glass { fill: var(--color-sky); }
+  .arrow { fill: none; stroke: var(--main); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+  .claw-arm { fill: none; stroke: var(--color-text-muted); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .trend { fill: none; stroke: var(--color-text); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 4 4; }
+
+  .line,
+  .ray,
+  .stem,
+  .beam,
+  .smile {
+    fill: none;
+    stroke-linecap: round;
+  }
+  .line { stroke: var(--color-text-muted); stroke-width: 2.5; }
+  .ray { stroke: var(--color-accent); stroke-width: 3; stroke-dasharray: 5 5; }
+  .stem { stroke: var(--color-text); stroke-width: 3.5; stroke-linejoin: round; }
+  .beam { stroke: var(--color-text); stroke-width: 7; }
+  .teeth {
+    fill: none;
+    stroke: var(--main);
+    stroke-width: 12;
+    stroke-dasharray: 9 7.9; /* the gaps between dashes become gaps between teeth */
+  }
+
+  .chip-text {
+    fill: var(--color-text);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  .face circle { fill: var(--color-text); }
+  .face .blush { fill: var(--color-recordshop); opacity: 0.45; }
+  .smile { stroke: var(--color-text); stroke-width: 2; }
+</style>

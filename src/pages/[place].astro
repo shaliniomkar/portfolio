@@ -13,7 +13,11 @@ import { places, type Place } from '../data/places';
 import { url } from '../utils/url';
 
 export function getStaticPaths() {
-  return places.map((place) => ({ params: { place: place.id }, props: { place } }));
+  // Places that already have their own real page are skipped here.
+  const built = ['workshop'];
+  return places
+    .filter((place) => !built.includes(place.id))
+    .map((place) => ({ params: { place: place.id }, props: { place } }));
 }
 
 interface Props {

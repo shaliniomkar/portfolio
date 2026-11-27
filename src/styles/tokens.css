@@ -1,7 +1,7 @@
 /*
- * Design tokens: every colour, font, size and radius the site uses,
+ * Design tokens: every color, font, size and radius the site uses,
  * picked from the mockup. Other stylesheets use these variables
- * instead of raw hex codes, so a colour changes in one place only.
+ * instead of raw hex codes, so a color changes in one place only.
  */
 :root {
   /* Page + text */
@@ -14,6 +14,7 @@
 
   /* Accent */
   --color-accent: #ffd86b;      /* yellow pill buttons + tabs */
+  --color-accent-tint: #fff3c9; /* pale yellow card background */
   --color-star: #d9a93a;        /* rating stars */
   --color-vinyl: #3a3038;       /* record disc */
   --color-fur: #ffffff;         /* Cherry the dog */
@@ -38,7 +39,7 @@
   --color-window-frame: #c9a37a;
   --color-window-glow: #ffe7a0;
 
-  /* One colour per house, a darker shade for roof edges,
+  /* One color per house, a darker shade for roof edges,
      and a pale tint for its section card */
   --color-workshop: #6fa8dc;    --color-workshop-dark: #5a90c2;    --color-workshop-tint: #e4f0fb;
   --color-gallery: #a88bd9;     --color-gallery-dark: #7a5bb5;     --color-gallery-tint: #efe8fa;

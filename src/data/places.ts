@@ -8,11 +8,11 @@ export interface Place {
   name: string;
   line: string;      // what the speech bubble says
   menuLine: string;  // shorter text for the "Where to?" card
-  x: number;         // centre of the building in the scene (1440-wide grid)
+  x: number;         // center of the building in the scene (1440-wide grid)
   kind: 'house' | 'lighthouse';
   roof: string;
   roofDark: string;
-  accent: string;    // icon colour on the menu card
+  accent: string;    // icon color on the menu card
   tint: string;      // pale background of the menu card
   door?: string;
   windows?: string[];

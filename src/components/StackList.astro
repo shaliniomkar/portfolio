@@ -1,0 +1,29 @@
+---
+/* A row of small pills naming the tools a project used. */
+interface Props {
+  items: string[];
+}
+const { items } = Astro.props;
+---
+
+<ul class="stack" aria-label="Built with">
+  {items.map((item) => <li>{item}</li>)}
+</ul>
+
+<style>
+  .stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    padding: 0.125rem var(--space-2);
+    border-radius: var(--radius-pill);
+    background: var(--color-page);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+</style>

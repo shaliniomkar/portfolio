@@ -1,0 +1,140 @@
+---
+/*
+ * /workshop/<id>/: one page per project. getStaticPaths builds a page for
+ * every file in the collection; the file name (without .md) becomes the id
+ * in the address, e.g. temp-monitor.md -> /workshop/temp-monitor/.
+ */
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import ProjectArt from '../../components/ProjectArt.astro';
+import StackList from '../../components/StackList.astro';
+import { getProjects } from '../../data/projects';
+import { url } from '../../utils/url';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((project) => ({ params: { id: project.id }, props: { project } }));
+}
+
+const { project } = Astro.props;
+const { title, summary, stack, art, tint, date, course, term, repo, demo } = project.data;
+// render() turns the Markdown below the frontmatter into HTML.
+const { Content } = await render(project);
+// timeZone: 'UTC' because dates in the .md file mean midnight UTC; without
+// it, US time zones would show the day before (and sometimes the wrong month).
+const finished = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+---
+
+<BaseLayout title={`${title} · Workshop · Shalini's Island`} description={summary}>
+  <SiteHeader />
+  <main class="project">
+    <a class="back" href={url('workshop/')}>← All projects</a>
+
+    <header class="intro">
+      <div class="art">
+        <ProjectArt kind={art} tint={tint} />
+      </div>
+      <div>
+        <h1>{title}</h1>
+        <p class="summary">{summary}</p>
+        <p class="date">
+          {course ? `${course} coursework${term ? ` · ${term}` : ''}` : `Finished ${finished}`}
+        </p>
+        <StackList items={stack} />
+        <div class="links">
+          {repo && <a class="pill pill-accent" href={repo}>View the code</a>}
+          {course && <p class="on-request">Code available on request (course honor code).</p>}
+          {demo && <a class="pill" href={demo}>See it running</a>}
+        </div>
+      </div>
+    </header>
+
+    {/* The write-up: whatever you wrote below the --- in the .md file */}
+    <article class="writeup">
+      <Content />
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .project {
+    max-width: 48rem;
+    margin: var(--space-5) auto var(--space-6);
+    padding: 0 var(--space-4);
+  }
+
+  .back {
+    font-weight: 600;
+  }
+
+  /* Art beside the title on wide screens, above it on phones */
+  .intro {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--space-4);
+    align-items: center;
+    margin: var(--space-4) 0 var(--space-5);
+  }
+
+  .art {
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+  }
+
+  h1 {
+    font-size: 2.25rem;
+    margin-bottom: var(--space-2);
+  }
+
+  .summary {
+    font-size: 1.2rem;
+    margin: 0 0 var(--space-2);
+  }
+
+  .date {
+    margin: 0 0 var(--space-3);
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  .on-request {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+
+  /* The write-up sits in a speech bubble. :global() is needed because the
+     headings and paragraphs come from Markdown, not from this file. */
+  .writeup {
+    padding: var(--space-5);
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+  }
+  .writeup :global(h2) {
+    margin-top: var(--space-5);
+    font-size: 1.5rem;
+  }
+  .writeup :global(h2:first-child) {
+    margin-top: 0;
+  }
+  .writeup :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-sm);
+  }
+  .writeup :global(code) {
+    padding: 0.1em 0.35em;
+    border-radius: 0.3em;
+    background: var(--color-page);
+    font-size: 0.9em;
+  }
+</style>

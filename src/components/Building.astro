@@ -12,13 +12,13 @@ import { GROUND, signOffset } from '../data/places';
 interface Props {
   id?: string;                // lets the page script find this building
   name: string;               // shown on the sign above it
-  x: number;                  // centre of the building, in scene units
+  x: number;                  // center of the building, in scene units
   ground?: number;            // y of the building's bottom edge
   kind?: 'house' | 'lighthouse';
-  roof: string;               // CSS colour, e.g. 'var(--color-workshop)'
+  roof: string;               // CSS color, e.g. 'var(--color-workshop)'
   roofDark: string;           // darker edge under the roof
   door?: string;
-  windows?: string[];         // two colours = two windows; one = one wide window
+  windows?: string[];         // two colors = two windows; one = one wide window
   vinyl?: boolean;            // record on the roof (Record Shop)
 }
 
@@ -113,7 +113,7 @@ const doorX = windows.length === 1 ? 50 : 0;
     .building { transition: none; }
   }
 
-  /* SVG shapes are coloured with `fill`. Using CSS variables here means the
+  /* SVG shapes are colored with `fill`. Using CSS variables here means the
      same component draws a blue, purple or coral house depending on what
      was passed in through `style`. */
   .wall { fill: var(--color-wall); }

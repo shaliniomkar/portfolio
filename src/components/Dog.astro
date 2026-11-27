@@ -56,8 +56,10 @@ const head: Tuft[] = [
 
   {/* Tail: a plume that curls up over her back. It's one curved line
       drawn twice: a wider shaded stroke for the outline, then a white one. */}
-  <path class="tail-outline" d="M-13 -24 Q-26 -32 -21 -41 Q-17 -46 -12 -42" />
-  <path class="tail" d="M-13 -24 Q-26 -32 -21 -41 Q-17 -46 -12 -42" />
+  <g class="tail-wag">
+    <path class="tail-outline" d="M-13 -24 Q-26 -32 -21 -41 Q-17 -46 -12 -42" />
+    <path class="tail" d="M-13 -24 Q-26 -32 -21 -41 Q-17 -46 -12 -42" />
+  </g>
 
   {/* Body: outline pass, then fill pass */}
   <g class="fluff-outline">
@@ -71,23 +73,26 @@ const head: Tuft[] = [
   <rect class="leg leg-b" x="-9" y="-15" width="7" height="15" rx="3.5" />
   <rect class="leg leg-a" x="13" y="-15" width="7" height="15" rx="3.5" />
 
-  {/* Head: big and round for a puppy, drawn the same two-pass way */}
-  <g class="fluff-outline">
-    {head.map(([cx, cy, r]) => <circle cx={cx} cy={cy} r={r} />)}
-  </g>
-  <g class="fluff-fill">
-    {head.map(([cx, cy, r]) => <circle cx={cx} cy={cy} r={r} />)}
-  </g>
+  {/* Head group: everything here moves together if a page animates .head */}
+  <g class="head">
+    {/* Head: big and round for a puppy, drawn the same two-pass way */}
+    <g class="fluff-outline">
+      {head.map(([cx, cy, r]) => <circle cx={cx} cy={cy} r={r} />)}
+    </g>
+    <g class="fluff-fill">
+      {head.map(([cx, cy, r]) => <circle cx={cx} cy={cy} r={r} />)}
+    </g>
 
-  {/* Short floppy ear with a fluffy tip */}
-  <ellipse class="ear" cx="12" cy="-32" rx="4.5" ry="6.5" transform="rotate(12 12 -32)" />
-  <circle class="ear" cx="11" cy="-26" r="3.5" />
+    {/* Short floppy ear with a fluffy tip */}
+    <ellipse class="ear" cx="12" cy="-32" rx="4.5" ry="6.5" transform="rotate(12 12 -32)" />
+    <circle class="ear" cx="11" cy="-26" r="3.5" />
 
-  {/* Face: a big eye with a white sparkle, nose, small smile */}
-  <circle class="feature" cx="22" cy="-36" r="2.6" />
-  <circle class="sparkle" cx="22.9" cy="-36.9" r="0.9" />
-  <circle class="feature" cx="34" cy="-30" r="2.2" />
-  <path class="mouth" d="M29 -26 Q31 -24.5 33 -26" />
+    {/* Face: a big eye with a white sparkle, nose, small smile */}
+    <circle class="feature" cx="22" cy="-36" r="2.6" />
+    <circle class="sparkle" cx="22.9" cy="-36.9" r="0.9" />
+    <circle class="feature" cx="34" cy="-30" r="2.2" />
+    <path class="mouth" d="M29 -26 Q31 -24.5 33 -26" />
+  </g>
 </g>
 
 <style>
@@ -127,7 +132,7 @@ const head: Tuft[] = [
 
   /*
    * Walking: each leg swings from its top (the hip), like a pendulum.
-   * `transform-box: fill-box` makes "top centre" mean the top of the leg
+   * `transform-box: fill-box` makes "top center" mean the top of the leg
    * itself rather than the top of the whole SVG.
    * Legs "a" and "b" swing in opposite directions, so diagonal pairs
    * move together, the way a real dog trots.

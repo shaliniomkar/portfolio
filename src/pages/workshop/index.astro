@@ -1,0 +1,169 @@
+---
+/*
+ * /workshop/: one card per project. The cards come from the projects
+ * collection, so adding a .md file to src/content/projects adds a card
+ * here, with no code changes.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import ProjectArt from '../../components/ProjectArt.astro';
+import StackList from '../../components/StackList.astro';
+import CherryEngineer from '../../components/CherryEngineer.astro';
+import { getProjectGroups } from '../../data/projects';
+import { url } from '../../utils/url';
+
+const { personal, coursework } = await getProjectGroups();
+
+// The two groups shown on the page. A group with no projects is skipped.
+const sections = [
+  { id: 'projects', title: 'My projects', items: personal },
+  { id: 'coursework', title: 'EECS 280 coursework', items: coursework },
+].filter((section) => section.items.length > 0);
+---
+
+<BaseLayout
+  title="Workshop · Shalini's Island"
+  description="Technical projects: embedded systems, hardware builds and ML work."
+>
+  <SiteHeader />
+  <main class="workshop">
+    <a class="back" href={url()}>← Back to the island</a>
+    <div class="top">
+      <div>
+        <h1>The Workshop</h1>
+        <p class="intro">
+          Technical projects: embedded systems, hardware builds and ML work, each with a write-up and code.
+        </p>
+      </div>
+      <div class="cherry laptop">
+        <CherryEngineer tool="laptop" label="Cherry in glasses, typing on a laptop" />
+      </div>
+    </div>
+
+    {sections.length === 0 && (
+      <p class="empty">Projects are on their way. Cherry is supervising.</p>
+    )}
+
+    {sections.map((section) => (
+      <section aria-labelledby={`${section.id}-title`}>
+        <h2 class="section-title" id={`${section.id}-title`}>{section.title}</h2>
+        {section.id === 'coursework' && (
+          <div class="top">
+            <p class="note">
+              Projects from Programming and Introductory Data Structures at the University of Michigan.
+              Code isn't public because of the course honor code, but it's available on request.
+            </p>
+            <div class="cherry wrench">
+              <CherryEngineer tool="wrench" label="Cherry in a hard hat, holding a wrench" />
+            </div>
+          </div>
+        )}
+        <ul class="grid">
+          {section.items.map((p) => (
+            <li>
+              <a class="card" href={url(`workshop/${p.id}/`)}>
+                <ProjectArt kind={p.data.art} tint={p.data.tint} />
+                <h3>{p.data.title}</h3>
+                <p>{p.data.summary}</p>
+                <StackList items={p.data.stack} />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </main>
+</BaseLayout>
+
+<style>
+  .workshop {
+    max-width: var(--content-width);
+    margin: var(--space-5) auto var(--space-6);
+    padding: 0 var(--space-4);
+  }
+
+  .back {
+    font-weight: 600;
+  }
+
+  h1 {
+    margin-top: var(--space-3);
+    font-size: 2.5rem;
+  }
+
+  .intro {
+    max-width: 40rem;
+  }
+
+  /* Text on the left, Cherry on the right; she drops below on phones. */
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+  .top > :first-child {
+    flex: 1 1 24rem;
+  }
+  .cherry.laptop { width: 15rem; }
+  .cherry.wrench { width: 5.5rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Each card is one big link, styled like a speech bubble */
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    height: 100%;
+    padding: var(--space-3);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    color: var(--color-text);
+    text-decoration: none;
+    transition: transform 0.15s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+  }
+
+  .section-title {
+    margin: var(--space-6) 0 var(--space-3);
+    font-size: 1.75rem;
+  }
+
+  .note {
+    max-width: 40rem;
+    margin-top: 0;
+    color: var(--color-text-muted);
+  }
+
+  .card h3 {
+    margin: var(--space-2) 0 0;
+    font-size: 1.3rem;
+  }
+
+  .card p {
+    margin: 0 0 var(--space-2);
+    font-size: 1rem;
+    flex-grow: 1; /* pushes the stack pills to the bottom so cards line up */
+  }
+
+  .empty {
+    color: var(--color-text-muted);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+  }
+</style>
