@@ -7,7 +7,10 @@
  * edge. `x` and `ground` then move the whole group into place, so the
  * shapes never need to know where on the island they are.
  */
+import { GROUND, signOffset } from '../data/places';
+
 interface Props {
+  id?: string;                // lets the page script find this building
   name: string;               // shown on the sign above it
   x: number;                  // centre of the building, in scene units
   ground?: number;            // y of the building's bottom edge
@@ -20,9 +23,10 @@ interface Props {
 }
 
 const {
+  id,
   name,
   x,
-  ground = 469,
+  ground = GROUND,
   kind = 'house',
   roof,
   roofDark,
@@ -31,8 +35,9 @@ const {
   vinyl = false,
 } = Astro.props;
 
-// How high the sign floats above the ground for each shape.
-const signY = kind === 'lighthouse' ? -275 : vinyl ? -238 : -205;
+// How high the sign floats above the ground (shared with Island.astro,
+// which needs it to size the clickable area).
+const signY = signOffset({ kind, vinyl });
 // Rough width so the sign fits its text (about 9 units per letter + padding).
 const signWidth = name.length * 9 + 32;
 // With one wide window, the door moves right to make room.
@@ -41,6 +46,7 @@ const doorX = windows.length === 1 ? 50 : 0;
 
 <g
   class="building"
+  data-place={id}
   transform={`translate(${x} ${ground})`}
   style={`--roof: ${roof}; --roof-dark: ${roofDark}; --door: ${door}`}
 >
@@ -94,6 +100,19 @@ const doorX = windows.length === 1 ? 50 : 0;
 </g>
 
 <style>
+  /* Selected or hovered buildings hop up a little. `translate` is a separate
+     CSS property from `transform`, so it adds to the SVG transform attribute
+     above instead of replacing it. */
+  .building {
+    transition: translate 0.2s ease;
+  }
+  .building:global(.is-active) {
+    translate: 0 -8px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .building { transition: none; }
+  }
+
   /* SVG shapes are coloured with `fill`. Using CSS variables here means the
      same component draws a blue, purple or coral house depending on what
      was passed in through `style`. */

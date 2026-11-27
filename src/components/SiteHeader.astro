@@ -1,0 +1,172 @@
+---
+/*
+ * Top of every page: the name card on the left, the nav pills on the right.
+ * On the home page it floats over the island's sky (`overlay`); on other
+ * pages it sits on its own sky-blue strip.
+ */
+import { url } from '../utils/url';
+
+interface Props {
+  overlay?: boolean;
+}
+
+const { overlay = false } = Astro.props;
+const isHome = overlay;
+---
+
+<header class:list={['site-header', { overlay }]}>
+  <a class="name-card" href={url()} aria-current={isHome ? 'page' : undefined}>
+    <span class="name">Shalini's Island</span>
+    <span class="tagline">Computer Engineering · University of Michigan</span>
+  </a>
+
+  <nav aria-label="Main">
+    <a class="pill" href={isHome ? '#menu' : `${url()}#menu`}>Skip to menu →</a>
+    {/* popovertarget connects this button to the menu below. The browser
+        then handles opening, closing on Esc or an outside click, and
+        returning focus to the button, with no extra code. */}
+    <button class="pill pill-accent" type="button" popovertarget="resume-menu">
+      Resume <span aria-hidden="true">▾</span>
+    </button>
+  </nav>
+
+  <div id="resume-menu" class="resume-menu" popover>
+    <p class="menu-title">Which one?</p>
+    <ul>
+      {/* autofocus: when the menu opens, keyboard focus jumps to the first choice */}
+      <li><a href={url('resume/shalini-embedded.pdf')} autofocus>Embedded</a></li>
+      <li><a href={url('resume/shalini-swe.pdf')}>Software</a></li>
+    </ul>
+  </div>
+</header>
+
+<script>
+  /*
+   * Place the resume menu just under its button. A popover opens in the
+   * browser's "top layer" (above everything else), so it doesn't sit next
+   * to the button by default; we measure the button and move it there
+   * each time it's about to open.
+   */
+  const menu = document.getElementById('resume-menu');
+  const button = document.querySelector<HTMLElement>('[popovertarget="resume-menu"]');
+
+  menu?.addEventListener('beforetoggle', (event) => {
+    if (!button || (event as ToggleEvent).newState !== 'open') return;
+    const box = button.getBoundingClientRect();
+    menu.style.top = `${box.bottom + window.scrollY + 12}px`;
+    menu.style.right = `${document.documentElement.clientWidth - box.right}px`;
+  });
+</script>
+
+<style>
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-4) var(--space-3);
+    background: var(--color-sky);
+  }
+
+  /* On wide screens, float over the top of the island scene. */
+  @media (min-width: 48rem) {
+    .site-header.overlay {
+      position: absolute;
+      inset: 0 0 auto 0; /* top: 0; left: 0; right: 0 */
+      z-index: 1;        /* above the scene */
+      background: none;
+      pointer-events: none; /* let clicks pass through the empty middle... */
+    }
+    .site-header.overlay > * {
+      pointer-events: auto; /* ...but not through the card and pills */
+    }
+  }
+
+  /* The name card is a speech bubble too: cream, rounded, solid shadow. */
+  .name-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-page);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .name {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+
+  .tagline {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  nav {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  /* The menu is a little speech bubble. The browser's default popover
+     styles centre it on screen, so inset and margin reset that. */
+  .resume-menu {
+    position: absolute;
+    inset: auto;
+    margin: 0;
+    padding: var(--space-3);
+    min-width: 11rem;
+    background: var(--color-page);
+    color: var(--color-text);
+    border: 0;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    overflow: visible; /* let the tail poke out */
+  }
+
+  /* The bubble's tail: a small rotated square peeking out of the top edge,
+     lined up under the Resume button. */
+  .resume-menu::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    right: 2.5rem;
+    width: 14px;
+    height: 14px;
+    background: inherit;
+    transform: rotate(45deg);
+    border-radius: 2px;
+  }
+
+  .menu-title {
+    margin: 0 0 var(--space-2);
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  .resume-menu ul {
+    display: grid;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .resume-menu a {
+    display: block;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .resume-menu a:hover {
+    background: var(--color-accent);
+  }
+</style>

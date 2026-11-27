@@ -1,0 +1,92 @@
+---
+/*
+ * "Where to?": a plain list of links to every section. It's the way around
+ * the site that doesn't need the island at all: it works with a keyboard,
+ * a screen reader, or with JavaScript turned off.
+ */
+import { places } from '../data/places';
+import { url } from '../utils/url';
+---
+
+<section id="menu" class="menu" aria-labelledby="menu-title">
+  <h2 id="menu-title">Where to?</h2>
+  <ul class="grid">
+    {places.map((p) => (
+      <li>
+        <a class="card" href={url(`${p.id}/`)} style={`--tint: ${p.tint}; --accent: ${p.accent}`}>
+          <span class:list={['icon', { vinyl: p.vinyl }]} aria-hidden="true"></span>
+          <span class="title">{p.name}</span>
+          <span class="text">{p.menuLine}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .menu {
+    max-width: var(--content-width);
+    margin: var(--space-6) auto;
+    scroll-margin-top: var(--space-4);
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+
+  /* auto-fit + minmax: as many 14rem-wide columns as fit, sharing the space.
+     Four across on a laptop, two on a tablet, one on a phone, no media queries. */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    height: 100%;
+    padding: var(--space-4);
+    background: var(--tint);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    text-decoration: none;
+    transition: transform 0.15s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+  }
+
+  .icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-bottom: var(--space-2);
+    background: var(--accent);
+    border-radius: var(--radius-sm);
+  }
+
+  /* The Record Shop's icon is a little record: dark circle, yellow middle */
+  .icon.vinyl {
+    border-radius: 50%;
+    background: radial-gradient(var(--color-accent) 0 22%, var(--color-vinyl) 24%);
+  }
+
+  .title {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 1.2rem;
+  }
+
+  .text {
+    font-size: 1rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+  }
+</style>

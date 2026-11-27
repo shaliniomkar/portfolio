@@ -14,10 +14,32 @@
 import Building from './Building.astro';
 import Dog from './Dog.astro';
 import DogToy from './DogToy.astro';
+import { places, GROUND, signOffset } from '../data/places';
+
+const W = 1440; // viewBox width
+const H = 620;  // viewBox height
+const pct = (n: number, total: number) => `${(n / total) * 100}%`;
+
+/*
+ * Clickable areas. SVG has no <button>, so each building gets a real HTML
+ * <button> laid exactly over it. Because the SVG fills the .scene box and
+ * keeps its shape, a position given in % of 1440 × 620 lands in the same
+ * spot at every screen size. Real buttons come with keyboard support
+ * (Tab to reach, Enter or Space to press) for free.
+ */
+const hitboxes = places.map((p) => {
+  const half = p.kind === 'lighthouse' ? 48 : 102;   // half the building's width
+  const top = GROUND + signOffset(p) - 22;           // just above the sign
+  return {
+    ...p,
+    style: `left: ${pct(p.x - half, W)}; top: ${pct(top, H)}; width: ${pct(half * 2, W)}; height: ${pct(GROUND - top + 6, H)}`,
+  };
+});
 ---
 
-<div class="scene-scroll" tabindex="0" aria-label="Island scene (scrolls sideways on small screens)">
-  <svg class="scene" viewBox="0 0 1440 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="island-title">
+<div class="scene-scroll">
+ <div class="scene">
+  <svg class="scene-art" viewBox="0 0 1440 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="island-title">
     <title id="island-title">
       A small pastel island with a Workshop, a Gallery, a Record Shop and a Lookout lighthouse, and Cherry the dog
     </title>
@@ -63,37 +85,20 @@ import DogToy from './DogToy.astro';
       <circle class="canopy" cx="1019" cy="412" r="27" />
     </g>
 
-    {/* 7. Buildings: same component, different props */}
-    <Building
-      name="Workshop"
-      x={200}
-      roof="var(--color-workshop)"
-      roofDark="var(--color-workshop-dark)"
-    />
-    <Building
-      name="Gallery"
-      x={513}
-      roof="var(--color-gallery)"
-      roofDark="var(--color-gallery-dark)"
-      door="var(--color-gallery-dark)"
-      windows={['var(--color-recordshop)', 'var(--color-lookout)']}
-    />
-    <Building
-      name="Record Shop"
-      x={820}
-      roof="var(--color-recordshop)"
-      roofDark="var(--color-recordshop-dark)"
-      door="var(--color-recordshop-dark)"
-      windows={['var(--color-sky)']}
-      vinyl
-    />
-    <Building
-      name="Lookout"
-      x={1152}
-      kind="lighthouse"
-      roof="var(--color-recordshop)"
-      roofDark="var(--color-recordshop-dark)"
-    />
+    {/* 7. Buildings: one component, drawn from the shared places list */}
+    {places.map((p) => (
+      <Building
+        id={p.id}
+        name={p.name}
+        x={p.x}
+        kind={p.kind}
+        roof={p.roof}
+        roofDark={p.roofDark}
+        door={p.door}
+        windows={p.windows}
+        vinyl={p.vinyl}
+      />
+    ))}
 
     {/* 8. Cherry's toys, scattered on the grass in front of the buildings */}
     <DogToy kind="ball" x={330} y={490} />
@@ -102,14 +107,31 @@ import DogToy from './DogToy.astro';
     <DogToy kind="ring" x={1060} y={482} />
     <DogToy kind="ball" x={1255} y={474} />
 
-
-    {/* 9. Cherry trots back and forth along the front of the island.
-           The outer <g> does the moving (see .walker below); Dog itself
-           only swings her legs. */}
-    <g class="walker">
-      <Dog scale={1.1} walking />
-    </g>
   </svg>
+
+  {/* Buttons laid over each building (see hitboxes above) */}
+  {hitboxes.map((p) => (
+    <button
+      class="hit"
+      type="button"
+      data-place={p.id}
+      aria-controls="bubble"
+      aria-pressed="false"
+      style={p.style}
+    >
+      <span class="visually-hidden">{p.name}</span>
+    </button>
+  ))}
+
+  {/* Cherry is a button too. She lives outside the big SVG, in her own
+      small one, so the button can travel with her as she trots. */}
+  <button class="cherry" type="button" data-cherry aria-controls="bubble">
+    <span class="visually-hidden">Cherry the dog. Click to hear what she thinks.</span>
+    <svg viewBox="-31 -54 70 58" aria-hidden="true">
+      <Dog walking />
+    </svg>
+  </button>
+ </div>
 </div>
 
 <style>
@@ -126,16 +148,34 @@ import DogToy from './DogToy.astro';
     background: var(--color-sky);
   }
 
-  /* tabindex="0" lets keyboard users focus the box and scroll it with arrow keys */
-  .scene-scroll:focus-visible {
-    outline-offset: -4px;
+  /* The box the art and buttons share. `position: relative` makes the
+     buttons' % positions measure from this box's corners. */
+  .scene {
+    position: relative;
+    min-width: 960px;
   }
 
-  .scene {
+  .scene-art {
     display: block; /* removes the small gap under inline elements */
     width: 100%;
-    min-width: 960px;
     height: auto;
+  }
+
+  /* Invisible buttons over the buildings: no background or border,
+     but a clear rounded focus ring when reached by keyboard. */
+  .hit {
+    position: absolute;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+  }
+
+  .hit:focus-visible,
+  .cherry:focus-visible {
+    outline: 3px solid var(--color-link);
+    outline-offset: 2px;
   }
 
   .sky { fill: var(--color-sky); }
@@ -166,35 +206,57 @@ import DogToy from './DogToy.astro';
   }
 
   /*
-   * Cherry's walk. In SVG, CSS "px" means the viewBox's units, so these
-   * numbers are positions on the 1440 × 620 grid. The y values rise and
-   * fall a little to follow the curve of the grass. At each end she
-   * pauses, then scaleX(-1) mirrors her so she faces the way she walks.
-   * With "reduce motion" on, she just stands still near the path.
+   * Cherry's walk. Her button is positioned with left/top in % of the
+   * scene (x / 1440 and y / 620 from the SVG grid), so she stays on the
+   * grass at any size. translate(-50%, -100%) puts her feet, not her
+   * top-left corner, on that point. The y values rise and fall a little to
+   * follow the curve of the grass. At each end she pauses, then
+   * scaleX(-1) mirrors her so she faces the way she walks.
    */
-  .walker {
-    transform: translate(590px, 528px);
+  .cherry {
+    position: absolute;
+    left: 40.97%;
+    top: 85.16%;
+    width: 5.35%;             /* 77 of 1440 scene units */
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transform: translate(-50%, -100%);
+  }
+
+  .cherry svg {
+    display: block;
+    width: 100%;
+    height: auto;
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .walker {
+    .cherry {
       animation: trot 30s linear infinite;
+    }
+    /* Hovering or focusing her makes her stop and wait to be clicked.
+       :global() reaches into Dog.astro to stop her legs too. */
+    .cherry:is(:hover, :focus-visible),
+    .cherry:is(:hover, :focus-visible) :global(.leg) {
+      animation-play-state: paused;
     }
   }
 
   @keyframes trot {
-    0%    { transform: translate(280px, 516px) scaleX(1); }
-    10%   { transform: translate(500px, 526px) scaleX(1); }
-    22%   { transform: translate(730px, 531px) scaleX(1); }
-    34%   { transform: translate(960px, 526px) scaleX(1); }
-    44%   { transform: translate(1180px, 514px) scaleX(1); }
-    49.9% { transform: translate(1180px, 514px) scaleX(1); }
-    50%   { transform: translate(1180px, 514px) scaleX(-1); }
-    60%   { transform: translate(960px, 526px) scaleX(-1); }
-    72%   { transform: translate(730px, 531px) scaleX(-1); }
-    84%   { transform: translate(500px, 526px) scaleX(-1); }
-    94%   { transform: translate(280px, 516px) scaleX(-1); }
-    99.9% { transform: translate(280px, 516px) scaleX(-1); }
-    100%  { transform: translate(280px, 516px) scaleX(1); }
+    0%    { left: 19.44%; top: 83.23%; transform: translate(-50%, -100%) scaleX(1); }
+    10%   { left: 34.72%; top: 84.84%; }
+    22%   { left: 50.69%; top: 85.65%; }
+    34%   { left: 66.67%; top: 84.84%; }
+    44%   { left: 81.94%; top: 82.9%;  transform: translate(-50%, -100%) scaleX(1); }
+    49.9% { left: 81.94%; top: 82.9%;  transform: translate(-50%, -100%) scaleX(1); }
+    50%   { left: 81.94%; top: 82.9%;  transform: translate(-50%, -100%) scaleX(-1); }
+    60%   { left: 66.67%; top: 84.84%; }
+    72%   { left: 50.69%; top: 85.65%; }
+    84%   { left: 34.72%; top: 84.84%; }
+    94%   { left: 19.44%; top: 83.23%; transform: translate(-50%, -100%) scaleX(-1); }
+    99.9% { left: 19.44%; top: 83.23%; transform: translate(-50%, -100%) scaleX(-1); }
+    100%  { left: 19.44%; top: 83.23%; transform: translate(-50%, -100%) scaleX(1); }
   }
 </style>

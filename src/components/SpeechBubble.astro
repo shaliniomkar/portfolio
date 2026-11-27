@@ -1,0 +1,170 @@
+---
+/*
+ * The speech bubble under the island. It starts with a welcome message.
+ * Clicking a building (or Cherry) swaps in new text; the <script> at the
+ * bottom does that.
+ *
+ * aria-live="polite" tells screen readers to read the new text out loud
+ * after it changes, once they finish what they're saying.
+ */
+---
+
+<section id="bubble" class="bubble" aria-live="polite">
+  <span class="tab" data-bubble-name>Welcome!</span>
+  <div class="body">
+    <div>
+      <p class="line" data-bubble-line>
+        Hi, I'm Shalini. This island holds my projects, art, music and travels.
+      </p>
+      <p class="hint">Tap a building on the island, or use the menu below.</p>
+    </div>
+    <a class="pill pill-accent step-inside" data-bubble-link href="#" hidden>Step inside</a>
+  </div>
+</section>
+
+<style>
+  .bubble {
+    position: relative;
+    max-width: var(--content-width);
+    margin: var(--space-5) auto 0;
+    padding: var(--space-5) var(--space-5) var(--space-4);
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    scroll-margin: var(--space-4); /* breathing room when scrolled into view */
+  }
+
+  /* The yellow label on the bubble's top edge */
+  .tab {
+    position: absolute;
+    top: 0;
+    left: var(--space-4);
+    transform: translateY(-50%);
+    padding: var(--space-1) var(--space-3);
+    background: var(--color-accent);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  /* The text takes the spare room; the button sits to its right,
+     and drops below it when there isn't space. */
+  .body > div {
+    flex: 1 1 24rem;
+  }
+
+  .line {
+    margin: 0 0 var(--space-2);
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .hint {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  /* `hidden` has to win over .pill's display: inline-flex */
+  .step-inside[hidden] {
+    display: none;
+  }
+</style>
+
+<script>
+  /*
+   * Plain TypeScript, no framework: Astro bundles it and runs it once
+   * when the page loads. It listens for clicks anywhere on the page and
+   * reacts only to the building buttons ([data-place]) and Cherry
+   * ([data-cherry]). Listening once on the whole document like this is
+   * called "event delegation".
+   */
+  import { places } from '../data/places';
+  import { remarks } from '../data/cherry';
+  import { url } from '../utils/url';
+
+  const bubble = document.getElementById('bubble');
+  const nameEl = bubble?.querySelector<HTMLElement>('[data-bubble-name]');
+  const lineEl = bubble?.querySelector<HTMLElement>('[data-bubble-line]');
+  const linkEl = bubble?.querySelector<HTMLAnchorElement>('[data-bubble-link]');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let lastRemark = -1;
+
+  /** Mark one building as selected (or none), in the scene and for screen readers. */
+  function markSelected(id: string | null) {
+    document.querySelectorAll<HTMLElement>('.hit').forEach((btn) => {
+      btn.setAttribute('aria-pressed', String(btn.dataset.place === id));
+    });
+    document.querySelectorAll<SVGGElement>('.building').forEach((g) => {
+      g.classList.toggle('is-selected', g.dataset.place === id);
+    });
+    refreshActive();
+  }
+
+  /** A building hops up while it's selected, hovered or focused. */
+  let hoverId: string | null = null;
+  function refreshActive() {
+    document.querySelectorAll<SVGGElement>('.building').forEach((g) => {
+      g.classList.toggle('is-active', g.classList.contains('is-selected') || g.dataset.place === hoverId);
+    });
+  }
+
+  /** Make sure the bubble is on screen (it's below the island on phones). */
+  function reveal() {
+    bubble?.scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
+  }
+
+  function showPlace(id: string) {
+    const place = places.find((p) => p.id === id);
+    if (!place || !nameEl || !lineEl || !linkEl) return;
+    nameEl.textContent = place.name;
+    lineEl.textContent = place.line;
+    linkEl.href = url(`${place.id}/`);
+    linkEl.textContent = `Step inside the ${place.name}`;
+    linkEl.hidden = false;
+    markSelected(id);
+    reveal();
+  }
+
+  function showCherry() {
+    if (!nameEl || !lineEl || !linkEl) return;
+    // Pick a random remark, re-rolling if it's the one she just said.
+    let i = lastRemark;
+    while (i === lastRemark && remarks.length > 1) {
+      i = Math.floor(Math.random() * remarks.length);
+    }
+    lastRemark = i;
+    nameEl.textContent = 'Cherry';
+    lineEl.textContent = remarks[i];
+    linkEl.hidden = true;
+    markSelected(null);
+    reveal();
+  }
+
+  document.addEventListener('click', (event) => {
+    const target = (event.target as Element).closest<HTMLElement>('[data-place], [data-cherry]');
+    if (!target) return;
+    if (target.dataset.place) showPlace(target.dataset.place);
+    else showCherry();
+  });
+
+  // Hover and keyboard focus both make a building hop.
+  document.querySelectorAll<HTMLElement>('.hit').forEach((btn) => {
+    const on = () => { hoverId = btn.dataset.place ?? null; refreshActive(); };
+    const off = () => { hoverId = null; refreshActive(); };
+    btn.addEventListener('pointerenter', on);
+    btn.addEventListener('pointerleave', off);
+    btn.addEventListener('focus', on);
+    btn.addEventListener('blur', off);
+  });
+</script>
