@@ -1,0 +1,201 @@
+---
+/*
+ * /record-shop/: DJ Cherry, a link to Shalini's Spotify, what's playing now,
+ * and the album ratings.
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AlbumShelf from '../../components/records/AlbumShelf';
+import type { Album } from '../../components/records/types';
+import nowSpinning from '../../data/now-spinning.json';
+import SiteHeader from '../../components/SiteHeader.astro';
+import CherryEngineer from '../../components/CherryEngineer.astro';
+import { links } from '../../data/links';
+import { url } from '../../utils/url';
+
+// Turn collection entries into plain objects for the Preact component.
+// If the album playing now is also one she's rated, its record spins.
+const playing = nowSpinning.title.toLowerCase();
+const albums: Album[] = (await getCollection('albums')).map(({ id, data }) => ({
+  id,
+  ...data,
+  spinning: data.title.toLowerCase() === playing,
+}));
+---
+
+<BaseLayout
+  title="Record Shop · Shalini's Island"
+  description="Albums Shalini is rating and what she's listening to right now."
+>
+  <SiteHeader />
+  <main class="record-shop">
+    <a class="back" href={url()}>← Back to the island</a>
+
+    <div class="top">
+      <div>
+        <h1>The Record Shop</h1>
+        <p class="intro">Albums I'm rating, what I'm listening to right now, and a short take on each.</p>
+
+        {/* Spotify link as a little card with its own record-and-notes art */}
+        <a class="spotify" href={links.spotify} target="_blank" rel="noopener">
+          <svg class="spotify-art" viewBox="0 0 48 48" aria-hidden="true">
+            <circle cx="22" cy="26" r="17" class="sp-disc" />
+            <circle cx="22" cy="26" r="11" class="sp-groove" />
+            <circle cx="22" cy="26" r="5" class="sp-label" />
+            <path d="M36 6 v12 m0 -12 l8 -2 v12" class="sp-note" />
+            <circle cx="34" cy="18" r="2.6" class="sp-head" />
+            <circle cx="42" cy="16" r="2.6" class="sp-head" />
+          </svg>
+          <span>
+            <span class="sp-title">Follow my listening on Spotify</span>
+            <span class="sp-sub">Playlists and what's on repeat <span aria-hidden="true">↗</span></span>
+          </span>
+          <span class="visually-hidden">(opens in a new tab)</span>
+        </a>
+      </div>
+      <div class="cherry">
+        <CherryEngineer tool="dj" label="Cherry wearing headphones, spinning a record" />
+      </div>
+    </div>
+
+    <section class="ratings" aria-labelledby="ratings-title">
+      <div class="ratings-top">
+        <h2 id="ratings-title">Album ratings</h2>
+        {/* "Now spinning" pill with a tiny turning record */}
+        <p class="now-spinning">
+          <span class="mini-vinyl" aria-hidden="true"></span>
+          <span>Now spinning: <strong>{nowSpinning.title}</strong> by {nowSpinning.artist}</span>
+        </p>
+      </div>
+
+      {/*
+        client:load = "run this component in the browser too". Astro first
+        renders it to plain HTML (so it shows instantly), then Preact takes
+        over so the sort buttons work.
+      */}
+      <AlbumShelf client:load albums={albums} />
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .record-shop {
+    max-width: var(--content-width);
+    margin: var(--space-5) auto var(--space-6);
+    padding: 0 var(--space-4);
+  }
+
+  .back { font-weight: 600; }
+
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+  .top > :first-child { flex: 1 1 24rem; }
+  .cherry { width: 15rem; } /* same scale as laptop Cherry in the Workshop */
+
+  h1 {
+    margin-top: var(--space-3);
+    font-size: 2.5rem;
+  }
+
+  .intro { max-width: 40rem; }
+
+  /* The Spotify card: a speech bubble in the Record Shop's peach tint */
+  .spotify {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4) var(--space-3) var(--space-3);
+    background: var(--color-recordshop-tint);
+    border-radius: var(--radius-md);
+    box-shadow: 0 0.25rem 0 var(--color-shadow);
+    color: var(--color-text);
+    text-decoration: none;
+    transition: transform 0.15s ease;
+  }
+  .spotify:hover { transform: translateY(-2px); }
+
+  .spotify-art { width: 3rem; height: 3rem; flex: none; }
+  .sp-disc { fill: var(--color-vinyl); }
+  .sp-groove { fill: none; stroke: var(--color-text-muted); stroke-width: 1; }
+  .sp-label { fill: var(--color-recordshop); }
+  .sp-note { fill: none; stroke: var(--color-text); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .sp-head { fill: var(--color-text); }
+
+  .sp-title {
+    display: block;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  .sp-sub {
+    display: block;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  /* The ratings sit on a big peach panel, like the mockup */
+  .ratings {
+    margin-top: var(--space-6);
+    padding: var(--space-5);
+    background: var(--color-recordshop-tint);
+    border-radius: var(--radius-lg);
+  }
+
+  .ratings-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+
+  .ratings h2 {
+    margin: 0;
+    font-size: 1.75rem;
+  }
+
+  .now-spinning {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
+    background: var(--color-surface);
+    border-radius: var(--radius-pill);
+    font-size: 0.95rem;
+  }
+
+  .mini-vinyl {
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-vinyl) 0 10%, var(--color-accent) 10% 32%, var(--color-vinyl) 32%);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .mini-vinyl {
+      /* a gap in the stripes so the spin is visible */
+      background:
+        conic-gradient(from 0deg, transparent 0 80%, rgb(255 255 255 / 0.25) 80% 86%, transparent 86%),
+        radial-gradient(circle, var(--color-vinyl) 0 10%, var(--color-accent) 10% 32%, var(--color-vinyl) 32%);
+      animation: mini-spin 2s linear infinite;
+    }
+  }
+  @keyframes mini-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 40rem) {
+    .ratings { padding: var(--space-4) var(--space-3); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .spotify { transition: none; }
+  }
+</style>

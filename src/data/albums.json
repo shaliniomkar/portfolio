@@ -1,0 +1,92 @@
+[
+  {
+    "id": "lets-start-here",
+    "title": "Let's Start Here.",
+    "artist": "Lil Yachty",
+    "year": 2023,
+    "rating": 5,
+    "take": "The production is absolutely amazing, wish I saw this album live.",
+    "color": "purple",
+    "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/03/80/6d/03806de7-553e-5a86-0734-b3e32e7eef7f/22UM1IM13153.rgb.jpg/600x600bb.jpg"
+  },
+  {
+    "id": "its-been-awful",
+    "title": "It's Been Awful",
+    "artist": "Isaiah Rashad",
+    "year": 2026,
+    "rating": 5,
+    "take": "I saw this album live!! He didn't perform my favorite song though :( (Nuthin 2 Hide)",
+    "color": "mint",
+    "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ad/ac/6e/adac6eb2-cfd8-6cd5-195b-32e6c9ab832c/093624820079.jpg/600x600bb.jpg"
+  },
+  {
+    "id": "cmiygl-estate-sale",
+    "title": "Call Me If You Get Lost: The Estate Sale",
+    "artist": "Tyler, The Creator",
+    "year": 2023,
+    "rating": 5,
+    "take": "Anyone who knows me in real life knows I love Tyler and almost every album of his is a 5.",
+    "color": "yellow",
+    "cover": "https://coverartarchive.org/release/44237978-668a-4658-ad06-f2efc763d914/front-500"
+  },
+  {
+    "id": "burning-desire",
+    "title": "Burning Desire",
+    "artist": "MIKE",
+    "year": 2023,
+    "rating": 5,
+    "take": "Everyone knows once MIKE starts singing the sample the song will be a banger.",
+    "color": "coral",
+    "cover": "https://coverartarchive.org/release-group/634bfb20-799d-4f6c-91e1-79c973d5cae5/front-500"
+  },
+  {
+    "id": "let-the-sun-talk",
+    "title": "Let the Sun Talk",
+    "artist": "Mavi",
+    "year": 2019,
+    "rating": 5,
+    "take": "It provokes thought, makes me feel smarter.",
+    "color": "blue",
+    "cover": "https://coverartarchive.org/release-group/6ef0d297-8e73-47bb-8cc2-43b4b28935e9/front-500"
+  },
+  {
+    "id": "thriller",
+    "title": "Thriller",
+    "artist": "Michael Jackson",
+    "year": 1982,
+    "rating": 5,
+    "take": "Come on.",
+    "color": "sky",
+    "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/32/4f/fd/324ffda2-9e51-8f6a-0c2d-c6fd2b41ac55/074643811224.jpg/600x600bb.jpg"
+  },
+  {
+    "id": "slide",
+    "title": "Slide",
+    "artist": "George Clanton",
+    "year": 2018,
+    "rating": 4,
+    "take": "I love the production, it feels like you're in space.",
+    "color": "purple",
+    "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/09/12/99/09129969-2ebe-9706-8682-e7c4565cc1f3/artwork.jpg/600x600bb.jpg"
+  },
+  {
+    "id": "got-a-story-to-tell",
+    "title": "Got a Story to Tell",
+    "artist": "Thee Sacred Souls",
+    "year": 2024,
+    "rating": 4,
+    "take": "Such a calm and cute album, perfect for daily tasks.",
+    "color": "mint",
+    "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/98/33/c0/9833c0fe-87e6-f084-b0bb-170a6a6bd0b2/107898.jpg/600x600bb.jpg"
+  },
+  {
+    "id": "blonde",
+    "title": "Blonde",
+    "artist": "Frank Ocean",
+    "year": 2016,
+    "rating": 5,
+    "take": "The world needs you, Frank.",
+    "color": "yellow",
+    "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/45/68/bb4568f3-68cd-619d-fbcb-4e179916545d/BlondCover-Final.jpg/600x600bb.jpg"
+  }
+]

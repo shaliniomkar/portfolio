@@ -1,0 +1,204 @@
+/*
+ * Styles for the Record Shop's Preact components. Plain CSS (imported by
+ * AlbumShelf.tsx), so class names start with "album-", "sort-" or "star"
+ * to avoid clashing with anything else on the site.
+ */
+
+/* ---- Sort buttons: pills, the picked one is yellow ---- */
+.sort {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+.sort-label {
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+.sort-button {
+  padding: var(--space-1) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  box-shadow: 0 0.2rem 0 var(--color-shadow);
+  color: var(--color-text);
+  font: 600 0.95rem var(--font-heading);
+  cursor: pointer;
+}
+.sort-button[aria-pressed='true'] {
+  background: var(--color-accent);
+  box-shadow: 0 0.2rem 0 var(--color-star);
+}
+
+/* ---- Grid of cards ---- */
+.album-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.album {
+  height: 100%;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+/* Each cover color sets two variables the rest of the card uses */
+.album-blue   { --cover: var(--color-workshop);    --label: var(--color-accent); }
+.album-purple { --cover: var(--color-gallery);     --label: var(--color-accent); }
+.album-coral  { --cover: var(--color-recordshop);  --label: var(--color-lookout); }
+.album-mint   { --cover: var(--color-lookout);     --label: var(--color-recordshop); }
+.album-yellow { --cover: var(--color-accent);      --label: var(--color-gallery); }
+.album-sky    { --cover: var(--color-sky);         --label: var(--color-recordshop); }
+
+/*
+ * Cover + record. The art box is a bit wider than the cover, leaving room
+ * on the right for the record to peek out from behind it.
+ */
+.album-art {
+  position: relative;
+  aspect-ratio: 1.4;
+  margin-bottom: var(--space-3);
+}
+
+.album-cover {
+  position: absolute;
+  inset: 0 auto 0 0; /* pinned to the left, full height */
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  padding: var(--space-3);
+  background: var(--cover);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  z-index: 1; /* in front of the record */
+}
+/* A real cover fills the whole square. The pastel color behind it shows
+   while the image loads. */
+.album-cover:has(img) {
+  padding: 0;
+  overflow: hidden;
+}
+.album-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.album-cover span {
+  font: 600 1.05rem/1.2 var(--font-heading);
+  color: var(--color-text);
+}
+
+/* The record: a dark circle with grooves and a colored label in the middle,
+   all one radial gradient (rings of color from the center outward). */
+.album-vinyl {
+  position: absolute;
+  top: 8%;
+  right: 0;
+  height: 84%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--color-vinyl) 0 6%,
+    var(--label) 6% 24%,
+    var(--color-vinyl) 24% 44%,
+    #4b404a 44% 46%,
+    var(--color-vinyl) 46% 62%,
+    #4b404a 62% 64%,
+    var(--color-vinyl) 64%
+  );
+  transition: transform 0.3s ease;
+}
+
+/* The record's center label: a round crop of the cover, sitting exactly
+   on the colored ring of the gradient (48% of the record's width). */
+.album-label {
+  position: absolute;
+  inset: 26%;
+  width: 48%;
+  height: 48%;
+  border-radius: 50%;
+  object-fit: cover;
+  /* a tiny spindle hole in the middle */
+  mask: radial-gradient(circle, transparent 0 9%, #000 10%);
+}
+
+/* Hovering a card slides the record out a little further */
+.album:hover .album-vinyl {
+  transform: translateX(6%);
+}
+
+.album-title {
+  margin: 0;
+  font-size: 1.15rem;
+}
+.album-meta {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+.album-take {
+  margin: var(--space-2) 0 0;
+  font-size: 0.95rem;
+}
+
+/* ---- Stars ---- */
+.stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.star {
+  position: relative;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+.star svg {
+  display: block;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+.star-empty path {
+  fill: none;
+  stroke: var(--color-star);
+  stroke-width: 1.5;
+}
+.star-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  overflow: hidden; /* this is what cuts the gold star in half */
+}
+.star-fill path {
+  fill: var(--color-accent);
+  stroke: var(--color-star);
+  stroke-width: 1.5;
+}
+.stars-number {
+  margin-left: var(--space-2);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* ---- Motion: the "now spinning" record turns ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .is-spinning .album-vinyl {
+    animation: album-spin 3s linear infinite;
+  }
+  .is-spinning:hover .album-vinyl {
+    animation-play-state: paused;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .album-vinyl { transition: none; }
+}
+@keyframes album-spin {
+  to { transform: rotate(360deg); }
+}

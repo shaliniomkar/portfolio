@@ -103,10 +103,21 @@ const hitboxes = places.map((p) => {
 
     {/* 8. Cherry's toys, scattered on the grass in front of the buildings */}
     <DogToy kind="ball" x={330} y={490} />
-    <DogToy kind="bone" x={590} y={486} rotate={-12} />
+    <DogToy kind="bone" x={480} y={490} rotate={-12} />
     <DogToy kind="rope" x={930} y={488} rotate={8} />
     <DogToy kind="ring" x={1060} y={482} />
     <DogToy kind="ball" x={1255} y={474} />
+
+    {/* 9. A wooden signpost by the path, so visitors know Cherry talks.
+           Two posts, then a board: a wood-colored rectangle with a cream
+           one inside it, and the text on top. */}
+    <g class="signpost" transform="translate(560 512)">
+      <rect class="post" x="-66" y="-46" width="8" height="46" rx="3" />
+      <rect class="post" x="58" y="-46" width="8" height="46" rx="3" />
+      <rect class="board" x="-86" y="-66" width="172" height="34" rx="9" />
+      <rect class="board-face" x="-81" y="-61" width="162" height="24" rx="6" />
+      <text class="board-text" x="0" y="-44" text-anchor="middle">Click Cherry to chat!</text>
+    </g>
 
   </svg>
 
@@ -190,6 +201,15 @@ const hitboxes = places.map((p) => {
   .trunk { fill: var(--color-wood); }
   .canopy-dark { fill: var(--color-tree-dark); }
   .canopy { fill: var(--color-tree); }
+  .post { fill: var(--color-wood); }
+  .board { fill: var(--color-wood); }
+  .board-face { fill: var(--color-wall); }
+  .board-text {
+    fill: var(--color-text);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 15px;
+  }
 
   /* Clouds drift slowly back and forth. People who turn on "reduce motion"
      in their system settings don't get the animation. */

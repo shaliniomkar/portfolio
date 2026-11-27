@@ -49,4 +49,22 @@ const experience = defineCollection({
   }),
 });
 
-export const collections = { projects, experience };
+/*
+ * Albums for the Record Shop, from src/data/albums.json. `rating` can be any
+ * half step from 0 to 5 (4.5 is fine, 4.3 isn't). What's playing right now
+ * lives separately, in src/data/now-spinning.json.
+ */
+const albums = defineCollection({
+  loader: file('src/data/albums.json'),
+  schema: z.object({
+    title: z.string(),
+    artist: z.string(),
+    year: z.number().int(),
+    rating: z.number().min(0).max(5).multipleOf(0.5),
+    take: z.string(),
+    color: z.enum(['blue', 'purple', 'coral', 'mint', 'yellow', 'sky']),
+    cover: z.url().optional(), // link to the official cover image
+  }),
+});
+
+export const collections = { projects, experience, albums };

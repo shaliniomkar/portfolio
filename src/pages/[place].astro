@@ -14,7 +14,7 @@ import { url } from '../utils/url';
 
 export function getStaticPaths() {
   // Places that already have their own real page are skipped here.
-  const built = ['workshop', 'experience'];
+  const built = ['workshop', 'experience', 'record-shop'];
   return places
     .filter((place) => !built.includes(place.id))
     .map((place) => ({ params: { place: place.id }, props: { place } }));

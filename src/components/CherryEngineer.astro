@@ -5,6 +5,7 @@
  *   tool="laptop": round glasses, typing away at a laptop
  *   tool="wrench": yellow hard hat, a wrench held in her mouth
  *   tool="mayor":  top hat and a sash with a gold medal (for the Town Hall)
+ *   tool="dj":     headphones on, spinning a record on a turntable
  *
  * Dog draws Cherry around (0, 0) = her feet. The extra shapes below use
  * the same grid, so the hat lands on her head and the wrench in her mouth.
@@ -12,14 +13,19 @@
 import Dog from './Dog.astro';
 
 interface Props {
-  tool: 'laptop' | 'wrench' | 'mayor';
+  tool: 'laptop' | 'wrench' | 'mayor' | 'dj';
   label?: string; // for screen readers; leave out if it's just decoration
 }
 
 const { tool, label } = Astro.props;
 // The visible area (the viewBox) is wider for the laptop, which sits beside her.
-const viewBox =
-  tool === 'laptop' ? '-34 -54 132 58' : tool === 'mayor' ? '-34 -66 86 70' : '-34 -56 86 60';
+const viewBoxes = {
+  laptop: '-34 -54 132 58', // wide: the laptop sits beside her
+  dj: '-34 -54 132 58',     // wide: so does the turntable
+  mayor: '-34 -66 86 70',   // tall: room for the top hat
+  wrench: '-34 -56 86 60',
+};
+const viewBox = viewBoxes[tool];
 ---
 
 <svg
@@ -43,6 +49,33 @@ const viewBox =
       {/* base and keyboard */}
       <path class="base" d="M40 -8 H92 L96 -1 H36 Z" />
       <path class="keys" d="M46 -5 H86" />
+    </g>
+  )}
+
+  {tool === 'dj' && (
+    <g class="turntable">
+      {/* the deck, seen from above: a wooden box with a record on it */}
+      <rect class="deck" x="42" y="-40" width="50" height="40" rx="6" />
+      <g class="record">
+        <circle class="disc" cx="64" cy="-20" r="15" />
+        <circle class="groove" cx="64" cy="-20" r="10.5" />
+        {/* a white shine line, so you can see the record turning */}
+        <path class="shine" d="M64 -33 A13 13 0 0 1 75 -27" />
+        <circle class="label" cx="64" cy="-20" r="4.5" />
+      </g>
+      {/* tone arm resting on the record */}
+      <path class="arm" d="M86 -34 L86 -18 L76 -12" />
+      <circle class="knob" cx="86" cy="-34" r="2.5" />
+      {/* little music notes floating up */}
+      <g class="note note-1">
+        <path d="M102 -34 v-10 l6 -2 v10" />
+        <circle cx="100.5" cy="-34" r="2" />
+        <circle cx="106.5" cy="-36" r="2" />
+      </g>
+      <g class="note note-2">
+        <path d="M110 -22 v-9" />
+        <circle cx="108.5" cy="-22" r="2" />
+      </g>
     </g>
   )}
 
@@ -78,6 +111,14 @@ const viewBox =
       </g>
     </>
   )}
+  {tool === 'dj' && (
+    /* headphones: a band over her head and a cushioned cup on her ear */
+    <g class="headphones nods">
+      <path class="band" d="M10 -37 Q11 -60 31 -49" />
+      <rect class="cup" x="6" y="-38" width="10" height="13" rx="4.5" />
+    </g>
+  )}
+
   {tool === 'mayor' && (
     <>
       {/* sash: a coral band across her body, with a gold medal */}
@@ -138,6 +179,23 @@ const viewBox =
   .sash path { fill: var(--color-recordshop); }
   .medal { fill: var(--color-accent); stroke: var(--color-star); stroke-width: 1.2; }
   .brim, .crown { fill: var(--color-vinyl); }
+  .deck { fill: var(--color-wood); }
+  .disc { fill: var(--color-vinyl); }
+  .groove { fill: none; stroke: var(--color-text-muted); stroke-width: 0.8; }
+  .shine { fill: none; stroke: var(--color-wall); stroke-width: 1.5; stroke-linecap: round; opacity: 0.8; }
+  .label { fill: var(--color-recordshop); }
+  .arm { fill: none; stroke: var(--color-wall); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .knob { fill: var(--color-wall); }
+  .note path { fill: none; stroke: var(--color-gallery); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .note circle { fill: var(--color-gallery); }
+  .band { fill: none; stroke: var(--color-recordshop-dark); stroke-width: 2.4; stroke-linecap: round; }
+  .cup { fill: var(--color-recordshop); }
+
+  /* The record spins around its own center (fill-box = its own box) */
+  .record {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
   .band { fill: var(--color-recordshop); }
 
   /*
@@ -184,7 +242,18 @@ const viewBox =
       animation: nod 2.4s ease-in-out infinite;
     }
 
-    /* Both: a happy tail wag. */
+    /* DJ: the record spins, she bobs her head to the beat, notes float up. */
+    .record {
+      animation: spin 1.8s linear infinite;
+    }
+    .dj :global(.head),
+    .dj .nods {
+      animation: nod 0.6s ease-in-out infinite;
+    }
+    .note-1 { animation: float 2s ease-in-out infinite; }
+    .note-2 { animation: float 2s ease-in-out 1s infinite; }
+
+    /* All of them: a happy tail wag. */
     .body :global(.tail-wag) {
       animation: wag 0.5s ease-in-out infinite alternate;
     }
@@ -201,6 +270,14 @@ const viewBox =
     0%, 60%, 100% { transform: translateY(0); }
     70% { transform: translateY(-4px); }
     80% { transform: translateY(0); }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes float {
+    0% { transform: translateY(0); opacity: 0; }
+    30% { opacity: 1; }
+    100% { transform: translateY(-8px); opacity: 0; }
   }
   @keyframes wag {
     from { transform: rotate(-10deg); }
