@@ -1,0 +1,57 @@
+---
+/*
+ * Placeholder home page for Phase 0. It only proves that the tokens,
+ * fonts and deploy work. The island scene replaces it in Phase 1.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Shalini's Island">
+  <main class="placeholder">
+    <div class="bubble">
+      <span class="tab">Coming soon</span>
+      <h1>Shalini's Island</h1>
+      <p>Computer Engineering · University of Michigan</p>
+      <p class="hint">The island is still being built. Check back soon!</p>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  /* Styles in an .astro file only apply to this page (Astro scopes them). */
+  .placeholder {
+    display: grid;
+    place-items: center; /* centres the bubble both ways */
+    min-height: 100vh;
+    padding: var(--space-4);
+  }
+
+  .bubble {
+    position: relative;
+    max-width: 32rem;
+    padding: var(--space-5) var(--space-5) var(--space-4);
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* The yellow label that sits on the bubble's top edge, like the mockup */
+  .tab {
+    position: absolute;
+    top: 0;
+    left: var(--space-4);
+    transform: translateY(-50%);
+    padding: var(--space-1) var(--space-3);
+    background: var(--color-accent);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .hint {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    margin-bottom: 0;
+  }
+</style>
