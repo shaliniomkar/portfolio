@@ -4,11 +4,11 @@ summary: Python analysis of website traffic to find The Recording Academy's fast
 stack: [Python, Data analysis]
 art: chart
 tint: coral
-date: 2026-05-01
+date: 2026-04-01
 order: 8
 ---
 
-A portfolio project (GCA) for The Recording Academy.
+A portfolio project for Wayne State's Global Career Accelerator (GCA), for The Recording Academy.
 
 ## What I did
 

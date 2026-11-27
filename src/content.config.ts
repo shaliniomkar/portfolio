@@ -32,7 +32,7 @@ const projects = defineCollection({
 /*
  * Experience: one JSON file (src/data/experience.json) holding a list of
  * roles. Add clubs or leadership as new entries with "kind": "club" or
- * "leadership". Dates are "YYYY-MM"; leave out "end" for a current role.
+ * "leadership" (or "program" for things like the Global Career Accelerator). Dates are "YYYY-MM"; leave out "end" for a current role.
  */
 const month = z.string().regex(/^\d{4}-\d{2}$/, 'Use YYYY-MM, e.g. 2026-08');
 
@@ -41,7 +41,7 @@ const experience = defineCollection({
   schema: z.object({
     role: z.string(),
     org: z.string(),
-    kind: z.enum(['research', 'work', 'leadership', 'club']),
+    kind: z.enum(['research', 'work', 'program', 'leadership', 'club']),
     start: month,
     end: month.optional(),
     summary: z.string(),

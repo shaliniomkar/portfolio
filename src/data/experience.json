@@ -19,5 +19,14 @@
     "start": "2026-01",
     "end": "2026-04",
     "summary": "Conducted time studies across plant operations (receiving, repack, shipping and office processes) to analyze labor distribution and determine per-unit processing costs for powertrain components."
+  },
+  {
+    "id": "wsu-gca",
+    "role": "Global Career Accelerator",
+    "org": "Wayne State University",
+    "kind": "program",
+    "start": "2026-01",
+    "end": "2026-04",
+    "summary": "Completed industry projects with real companies, including a SQL sustainability analysis for Intel and an audience analysis of website traffic for The Recording Academy (GRAMMYs)."
   }
 ]
