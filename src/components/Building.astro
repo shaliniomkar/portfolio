@@ -20,6 +20,7 @@ interface Props {
   door?: string;
   windows?: string[];         // two colors = two windows; one = one wide window
   vinyl?: boolean;            // record on the roof (Record Shop)
+  clock?: boolean;            // clock on the roof (Town Hall)
 }
 
 const {
@@ -33,11 +34,12 @@ const {
   door = 'var(--color-wood)',
   windows = ['var(--color-window-glow)', 'var(--color-window-glow)'],
   vinyl = false,
+  clock = false,
 } = Astro.props;
 
 // How high the sign floats above the ground (shared with Island.astro,
 // which needs it to size the clickable area).
-const signY = signOffset({ kind, vinyl });
+const signY = signOffset({ kind, vinyl, clock });
 // Rough width so the sign fits its text (about 9 units per letter + padding).
 const signWidth = name.length * 9 + 32;
 // With one wide window, the door moves right to make room.
@@ -71,6 +73,15 @@ const doorX = windows.length === 1 ? 50 : 0;
 
       {/* Door: straight sides with a half-circle (arc) on top */}
       <path class="door" d={`M${doorX - 20} -8 V-38 A20 20 0 0 1 ${doorX + 20} -38 V-8 Z`} />
+
+      {clock && (
+        <g class="clock">
+          <circle cx="0" cy="-190" r="26" class="clock-face" />
+          {/* hands pointing at about 10 past 10, the classic "smiling" clock */}
+          <path class="clock-hand" d="M0 -190 L-11 -197 M0 -190 L10 -199" />
+          <circle cx="0" cy="-190" r="3" class="clock-pin" />
+        </g>
+      )}
 
       {vinyl && (
         <g class="vinyl">
@@ -131,6 +142,17 @@ const doorX = windows.length === 1 ? 50 : 0;
     stroke-width: 4;
   }
   .vinyl-disc { fill: var(--color-vinyl); }
+  .clock-face {
+    fill: var(--color-wall);
+    stroke: var(--color-star);
+    stroke-width: 5;
+  }
+  .clock-hand {
+    stroke: var(--color-text);
+    stroke-width: 3.5;
+    stroke-linecap: round;
+  }
+  .clock-pin { fill: var(--color-text); }
   .vinyl-label { fill: var(--color-accent); }
 
   .sign-shadow { fill: var(--color-shadow); }

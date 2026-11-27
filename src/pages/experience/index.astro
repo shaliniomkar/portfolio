@@ -1,0 +1,188 @@
+---
+/*
+ * /experience/: the Town Hall. A short "about me", a simple timeline of
+ * roles (newest first), and buttons for both resumes.
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import CherryEngineer from '../../components/CherryEngineer.astro';
+import { url } from '../../utils/url';
+
+// Newest first. "2026-08" > "2026-01" works as plain text comparison
+// because every date has the same YYYY-MM shape.
+const roles = (await getCollection('experience')).sort((a, b) =>
+  b.data.start.localeCompare(a.data.start),
+);
+
+/** "2026-08" -> "Aug 2026" */
+function month(value: string): string {
+  const [year, m] = value.split('-').map(Number);
+  return new Date(Date.UTC(year, m - 1)).toLocaleDateString('en-US', {
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+}
+
+const labels = { research: 'Research', work: 'Work', leadership: 'Leadership', club: 'Club' };
+---
+
+<BaseLayout
+  title="Experience · Shalini's Island"
+  description="Shalini's research and work experience, with embedded and software resumes."
+>
+  <SiteHeader />
+  <main class="town-hall">
+    <a class="back" href={url()}>← Back to the island</a>
+
+    <div class="top">
+      <div>
+        <h1>The Town Hall</h1>
+        <p class="about">
+          I'm a Computer Engineering student at the University of Michigan. I transferred in Fall 2026,
+          after a year studying Electrical and Computer Engineering at Wayne State University.
+        </p>
+        <div class="resumes">
+          <a class="pill pill-accent" href={url('resume/shalini-embedded.pdf')}>Embedded resume</a>
+          <a class="pill" href={url('resume/shalini-swe.pdf')}>Software resume</a>
+        </div>
+      </div>
+      <div class="cherry">
+        <CherryEngineer tool="mayor" label="Cherry the mayor, in a top hat and sash" />
+      </div>
+    </div>
+
+    <h2>Experience</h2>
+    {/* An ordered list, because the order (newest first) means something */}
+    <ol class="timeline">
+      {roles.map(({ data }) => (
+        <li class="entry">
+          <span class="dot" aria-hidden="true"></span>
+          <div class="card">
+            <p class="when">
+              {month(data.start)} – {data.end ? month(data.end) : 'Present'}
+              <span class="kind">{labels[data.kind]}</span>
+            </p>
+            <h3>{data.role}</h3>
+            <p class="org">{data.org}</p>
+            <p>{data.summary}</p>
+            {data.points && (
+              <ul>
+                {data.points.map((point) => <li>{point}</li>)}
+              </ul>
+            )}
+          </div>
+        </li>
+      ))}
+    </ol>
+  </main>
+</BaseLayout>
+
+<style>
+  .town-hall {
+    max-width: 48rem;
+    margin: var(--space-5) auto var(--space-6);
+    padding: 0 var(--space-4);
+  }
+
+  .back { font-weight: 600; }
+
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+  }
+  .top > :first-child { flex: 1 1 22rem; }
+  .cherry { width: 7rem; }
+
+  h1 {
+    margin-top: var(--space-3);
+    font-size: 2.5rem;
+  }
+
+  .about {
+    max-width: 36rem;
+    font-size: 1.15rem;
+  }
+
+  .resumes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  h2 { font-size: 1.75rem; }
+
+  /*
+   * The timeline: a dashed line down the left (the list's border), and a
+   * yellow dot beside each card sitting on top of that line.
+   */
+  .timeline {
+    margin: 0;
+    padding: 0 0 0 var(--space-5);
+    list-style: none;
+    border-left: 3px dashed var(--color-shadow);
+    margin-left: var(--space-2);
+  }
+
+  .entry {
+    position: relative;
+    margin-bottom: var(--space-4);
+  }
+
+  .dot {
+    position: absolute;
+    left: calc(-1 * var(--space-5) - 11px); /* centered on the dashed line */
+    top: var(--space-4);
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    background: var(--color-accent);
+    box-shadow: 0 0 0 4px var(--color-page); /* a gap around the dot */
+  }
+
+  .card {
+    padding: var(--space-4);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+  }
+
+  .when {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .kind {
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-pill);
+    background: var(--color-accent-tint);
+    color: var(--color-text);
+    font-size: 0.8rem;
+  }
+
+  h3 {
+    margin: var(--space-2) 0 0;
+    font-size: 1.3rem;
+  }
+
+  .org {
+    margin: 0 0 var(--space-2);
+    font-weight: 600;
+  }
+
+  .card p:last-child,
+  .card ul {
+    margin-bottom: 0;
+  }
+</style>

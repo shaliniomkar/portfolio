@@ -5,7 +5,7 @@
  * and tells you which file is wrong, instead of shipping a broken page.
  */
 import { defineCollection } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { glob, file } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { artKinds } from './data/projectArt';
 
@@ -29,4 +29,24 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { projects };
+/*
+ * Experience: one JSON file (src/data/experience.json) holding a list of
+ * roles. Add clubs or leadership as new entries with "kind": "club" or
+ * "leadership". Dates are "YYYY-MM"; leave out "end" for a current role.
+ */
+const month = z.string().regex(/^\d{4}-\d{2}$/, 'Use YYYY-MM, e.g. 2026-08');
+
+const experience = defineCollection({
+  loader: file('src/data/experience.json'),
+  schema: z.object({
+    role: z.string(),
+    org: z.string(),
+    kind: z.enum(['research', 'work', 'leadership', 'club']),
+    start: month,
+    end: month.optional(),
+    summary: z.string(),
+    points: z.array(z.string()).optional(),
+  }),
+});
+
+export const collections = { projects, experience };

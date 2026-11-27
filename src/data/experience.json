@@ -1,0 +1,23 @@
+[
+  {
+    "id": "umich-research",
+    "role": "Undergraduate Researcher",
+    "org": "University of Michigan, Prof. Zetian Mi's group",
+    "kind": "research",
+    "start": "2026-08",
+    "summary": "Working on AI-assisted analysis of reflection high-energy electron diffraction (RHEED) data during molecular beam epitaxy (MBE) growth of ferroelectric nitride semiconductors.",
+    "points": [
+      "Real-time surface-status classification",
+      "Strain relaxation tracking to support closed-loop growth monitoring"
+    ]
+  },
+  {
+    "id": "renaissance-logistics",
+    "role": "Operations Analysis Assistant",
+    "org": "Renaissance Global Logistics",
+    "kind": "work",
+    "start": "2026-01",
+    "end": "2026-04",
+    "summary": "Conducted time studies across plant operations (receiving, repack, shipping and office processes) to analyze labor distribution and determine per-unit processing costs for powertrain components."
+  }
+]

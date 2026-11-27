@@ -4,7 +4,7 @@
  * pages, so a name or description only ever changes here.
  */
 export interface Place {
-  id: 'workshop' | 'gallery' | 'record-shop' | 'lookout';
+  id: 'workshop' | 'gallery' | 'experience' | 'record-shop' | 'lookout';
   name: string;
   line: string;      // what the speech bubble says
   menuLine: string;  // shorter text for the "Where to?" card
@@ -16,7 +16,8 @@ export interface Place {
   tint: string;      // pale background of the menu card
   door?: string;
   windows?: string[];
-  vinyl?: boolean;
+  vinyl?: boolean;   // record on the roof (Record Shop)
+  clock?: boolean;   // clock on the roof (Town Hall)
 }
 
 export const places: Place[] = [
@@ -25,7 +26,7 @@ export const places: Place[] = [
     name: 'Workshop',
     line: 'Technical projects: embedded systems, hardware builds and ML work, each with a write-up, photos and code.',
     menuLine: 'Technical projects: embedded, hardware, ML.',
-    x: 200,
+    x: 185,
     kind: 'house',
     roof: 'var(--color-workshop)',
     roofDark: 'var(--color-workshop-dark)',
@@ -37,7 +38,7 @@ export const places: Place[] = [
     name: 'Gallery',
     line: "Art I've made, from sketches to finished pieces.",
     menuLine: "Art I've made.",
-    x: 513,
+    x: 432,
     kind: 'house',
     roof: 'var(--color-gallery)',
     roofDark: 'var(--color-gallery-dark)',
@@ -47,11 +48,26 @@ export const places: Place[] = [
     windows: ['var(--color-recordshop)', 'var(--color-lookout)'],
   },
   {
+    id: 'experience',
+    name: 'Town Hall',
+    line: 'Experience: my research and work, with both versions of my resume.',
+    menuLine: 'Experience: research and work.',
+    x: 698,
+    kind: 'house',
+    roof: 'var(--color-accent)',
+    roofDark: 'var(--color-star)',
+    accent: 'var(--color-accent)',
+    tint: 'var(--color-accent-tint)',
+    door: 'var(--color-workshop-dark)',
+    windows: ['var(--color-window-glow)', 'var(--color-window-glow)'],
+    clock: true,
+  },
+  {
     id: 'record-shop',
     name: 'Record Shop',
     line: "Albums I'm rating, what I'm listening to right now, and a short take on each.",
     menuLine: "Albums I'm rating and what I'm listening to.",
-    x: 820,
+    x: 964,
     kind: 'house',
     roof: 'var(--color-recordshop)',
     roofDark: 'var(--color-recordshop-dark)',
@@ -66,7 +82,7 @@ export const places: Place[] = [
     name: 'Lookout',
     line: "Photography and places I've been, pinned on a map.",
     menuLine: "Photography and places I've been, pinned on a map.",
-    x: 1152,
+    x: 1225,
     kind: 'lighthouse',
     roof: 'var(--color-recordshop)',
     roofDark: 'var(--color-recordshop-dark)',
@@ -79,7 +95,7 @@ export const places: Place[] = [
 export const GROUND = 469;
 
 /** How far above the ground a building's sign floats (negative = up). */
-export function signOffset(place: Pick<Place, 'kind' | 'vinyl'>): number {
+export function signOffset(place: Pick<Place, 'kind' | 'vinyl' | 'clock'>): number {
   if (place.kind === 'lighthouse') return -275;
-  return place.vinyl ? -238 : -205;
+  return place.vinyl || place.clock ? -238 : -205;
 }
