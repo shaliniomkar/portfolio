@@ -106,8 +106,11 @@ const sections = [
   .top > :first-child {
     flex: 1 1 24rem;
   }
+  /* Both pictures draw Cherry at the same scale: the laptop picture is
+     132 grid units wide and the wrench one 86, so the wrench box gets
+     86/132 of the laptop box's width. That keeps Cherry the same size. */
   .cherry.laptop { width: 15rem; }
-  .cherry.wrench { width: 5.5rem; }
+  .cherry.wrench { width: calc(15rem * 86 / 132); }
 
   .grid {
     display: grid;
