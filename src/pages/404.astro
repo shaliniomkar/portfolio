@@ -1,0 +1,70 @@
+---
+/*
+ * The "page not found" page. Astro builds it as 404.html, and GitHub Pages
+ * shows it automatically whenever someone visits an address that doesn't
+ * exist on the site.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import CherryEngineer from '../components/CherryEngineer.astro';
+import { url } from '../utils/url';
+---
+
+<BaseLayout title="Lost at sea · Shalini's Island" description="This page doesn't exist.">
+  <SiteHeader />
+  <main class="lost">
+    <div class="cherry">
+      <CherryEngineer tool="wrench" label="Cherry in a hard hat, holding a wrench" />
+    </div>
+    <p class="code">404</p>
+    <h1>This part of the island hasn't been built yet</h1>
+    <p class="bubble">
+      <strong>Cherry:</strong> I dug everywhere. Nothing here. Not even a treat. Very disappointing.
+    </p>
+    <div class="actions">
+      <a class="pill pill-accent" href={url()}>Back to the island</a>
+      <a class="pill" href={`${url()}#menu`}>See all places</a>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .lost {
+    max-width: 36rem;
+    margin: var(--space-5) auto var(--space-6);
+    padding: 0 var(--space-4);
+    text-align: center;
+  }
+
+  .cherry {
+    width: 9rem;
+    margin: 0 auto var(--space-2);
+  }
+
+  .code {
+    margin: 0;
+    font: 600 1rem var(--font-heading);
+    letter-spacing: 0.2em;
+    color: var(--color-text-muted);
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  /* Cherry's line, in a little speech bubble */
+  .bubble {
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+</style>

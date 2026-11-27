@@ -1,0 +1,90 @@
+---
+/*
+ * Footer on every page: a dashed line, a little sign-off with Cherry, and
+ * links to both resumes and Shalini's profiles. Links come from
+ * src/data/links.ts, and any link set to undefined there is skipped.
+ */
+import Dog from './Dog.astro';
+import { links } from '../data/links';
+import { url } from '../utils/url';
+
+const items = [
+  { label: 'Resume (Embedded)', href: url('resume/shalini-embedded.pdf') },
+  { label: 'Resume (Software)', href: url('resume/shalini-swe.pdf') },
+  { label: 'GitHub', href: links.github, external: true },
+  links.linkedin && { label: 'LinkedIn', href: links.linkedin, external: true },
+  { label: 'Spotify', href: links.spotify, external: true },
+  links.email && { label: 'Email', href: `mailto:${links.email}` },
+].filter(Boolean) as { label: string; href: string; external?: boolean }[];
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="inner">
+    <p class="signoff">
+      <svg class="mini-cherry" viewBox="-31 -54 70 58" aria-hidden="true"><Dog /></svg>
+      <span>© {year} Shalini Omkar</span>
+    </p>
+    <nav aria-label="Elsewhere">
+      <ul>
+        {items.map((item) => (
+          <li>
+            <a href={item.href} {...(item.external ? { target: '_blank', rel: 'noopener' } : {})}>
+              {item.label}
+              {item.external && <span class="visually-hidden"> (opens in a new tab)</span>}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: auto; /* pushes the footer to the bottom on short pages */
+    padding: 0 var(--space-4) var(--space-5);
+  }
+
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding-top: var(--space-4);
+    border-top: 2px dashed var(--color-shadow);
+  }
+
+  .signoff {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    color: var(--color-text-muted);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .mini-cherry {
+    width: 2.25rem;
+    height: auto;
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+</style>
