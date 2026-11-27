@@ -13,9 +13,13 @@ import CherryEngineer from '../../components/CherryEngineer.astro';
 import { links } from '../../data/links';
 import { url } from '../../utils/url';
 
+// What's playing now. The weekly Spotify job (scripts/now-spinning.mjs)
+// rewrites now-spinning.json and may add a cover image and a Spotify link.
+const spinning: { title: string; artist: string; cover?: string; url?: string } = nowSpinning;
+
 // Turn collection entries into plain objects for the Preact component.
 // If the album playing now is also one she's rated, its record spins.
-const playing = nowSpinning.title.toLowerCase();
+const playing = spinning.title.toLowerCase();
 const albums: Album[] = (await getCollection('albums')).map(({ id, data }) => ({
   id,
   ...data,
@@ -63,8 +67,21 @@ const albums: Album[] = (await getCollection('albums')).map(({ id, data }) => ({
         <h2 id="ratings-title">Album ratings</h2>
         {/* "Now spinning" pill with a tiny turning record */}
         <p class="now-spinning">
-          <span class="mini-vinyl" aria-hidden="true"></span>
-          <span>Now spinning: <strong>{nowSpinning.title}</strong> by {nowSpinning.artist}</span>
+          {/* The tiny record's label shows the album cover when there is one */}
+          <span
+            class="mini-vinyl"
+            aria-hidden="true"
+            style={spinning.cover ? `--label-img: url('${spinning.cover}')` : undefined}
+          ></span>
+          <span>
+            Now spinning:{' '}
+            {spinning.url ? (
+              <a href={spinning.url} target="_blank" rel="noopener"><strong>{spinning.title}</strong></a>
+            ) : (
+              <strong>{spinning.title}</strong>
+            )}{' '}
+            by {spinning.artist}
+          </span>
         </p>
       </div>
 
@@ -172,18 +189,27 @@ const albums: Album[] = (await getCollection('albums')).map(({ id, data }) => ({
   }
 
   .mini-vinyl {
+    flex: none;
     width: 1.6rem;
     height: 1.6rem;
     border-radius: 50%;
     background: radial-gradient(circle, var(--color-vinyl) 0 10%, var(--color-accent) 10% 32%, var(--color-vinyl) 32%);
   }
 
+  /* With a cover: the label in the middle becomes the album art */
+  .mini-vinyl[style] {
+    background:
+      radial-gradient(circle, var(--color-vinyl) 0 10%, transparent 10% 32%, var(--color-vinyl) 32%),
+      var(--label-img) center / 64% no-repeat,
+      var(--color-vinyl);
+  }
+
+  .now-spinning a {
+    color: inherit;
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .mini-vinyl {
-      /* a gap in the stripes so the spin is visible */
-      background:
-        conic-gradient(from 0deg, transparent 0 80%, rgb(255 255 255 / 0.25) 80% 86%, transparent 86%),
-        radial-gradient(circle, var(--color-vinyl) 0 10%, var(--color-accent) 10% 32%, var(--color-vinyl) 32%);
       animation: mini-spin 2s linear infinite;
     }
   }

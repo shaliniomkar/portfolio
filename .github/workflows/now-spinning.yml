@@ -1,0 +1,43 @@
+# Every Monday, asks Spotify for Shalini's top tracks, picks the album she's
+# played most, and updates "Now spinning" on the Record Shop page.
+name: Update Now spinning
+
+on:
+  schedule:
+    - cron: '0 14 * * 1' # Mondays at 14:00 UTC (9 AM in Michigan in winter)
+  workflow_dispatch: # also lets you run it by hand from the Actions tab
+
+permissions:
+  contents: write # to commit the updated now-spinning.json
+  actions: write # to start the deploy workflow afterwards
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v7
+
+      - name: Pick this week's album
+        run: node scripts/now-spinning.mjs
+        env:
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SPOTIFY_REFRESH_TOKEN: ${{ secrets.SPOTIFY_REFRESH_TOKEN }}
+
+      # Only commit and redeploy if the album actually changed.
+      # A push made by this workflow doesn't start other workflows on its own
+      # (GitHub's rule to prevent loops), so it starts the deploy directly.
+      - name: Commit and redeploy if it changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet; then
+            echo "No change this week."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Now spinning: weekly update from Spotify"
+          git push
+          gh workflow run deploy.yml --ref main
