@@ -3,6 +3,11 @@
  * Footer on every page: a dashed line, a little sign-off with Cherry, and
  * links to both resumes and Shalini's profiles. Links come from
  * src/data/links.ts, and any link set to undefined there is skipped.
+ *
+ * The email is shown as the address itself, plus a Copy button. A plain
+ * "mailto:" link only works if the visitor has a mail app set up (many
+ * people use Gmail in the browser instead), so the address must be visible
+ * and easy to copy too.
  */
 import Dog from './Dog.astro';
 import { links } from '../data/links';
@@ -13,8 +18,6 @@ const items = [
   { label: 'Resume (Software)', href: url('resume/shalini-swe.pdf') },
   { label: 'GitHub', href: links.github, external: true },
   links.linkedin && { label: 'LinkedIn', href: links.linkedin, external: true },
-  { label: 'Spotify', href: links.spotify, external: true },
-  links.email && { label: 'Email', href: `mailto:${links.email}` },
 ].filter(Boolean) as { label: string; href: string; external?: boolean }[];
 
 const year = new Date().getFullYear();
@@ -36,10 +39,60 @@ const year = new Date().getFullYear();
             </a>
           </li>
         ))}
+        {links.email && (
+          <li class="email">
+            <a href={`mailto:${links.email}`}>{links.email}</a>
+            <button type="button" class="copy" data-copy={links.email}>Copy</button>
+            {/* Screen readers announce "Copied" when the button works */}
+            <span class="copied visually-hidden" role="status" aria-live="polite"></span>
+          </li>
+        )}
       </ul>
     </nav>
   </div>
 </footer>
+
+<script>
+  /**
+   * Put text on the clipboard. The modern clipboard API is tried first; some
+   * browsers block it (for example inside embedded views), so the fallback is
+   * the older trick: put the text in a hidden box, select it, and "copy".
+   */
+  async function copyText(text: string): Promise<boolean> {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      const box = document.createElement('textarea');
+      box.value = text;
+      box.setAttribute('readonly', '');
+      box.style.position = 'fixed';
+      box.style.opacity = '0';
+      document.body.append(box);
+      box.select();
+      const ok = document.execCommand('copy');
+      box.remove();
+      return ok;
+    }
+  }
+
+  // Copy the email address, then say "Copied!" for 2 seconds.
+  document.querySelectorAll<HTMLButtonElement>('.copy').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const status = button.nextElementSibling as HTMLElement | null;
+      if (await copyText(button.dataset.copy ?? '')) {
+        button.textContent = 'Copied!';
+        if (status) status.textContent = 'Email address copied';
+      } else {
+        button.textContent = 'Copy failed';
+      }
+      setTimeout(() => {
+        button.textContent = 'Copy';
+        if (status) status.textContent = '';
+      }, 2000);
+    });
+  });
+</script>
 
 <style>
   .site-footer {
@@ -86,5 +139,22 @@ const year = new Date().getFullYear();
   a {
     font-weight: 700;
     font-size: 0.95rem;
+  }
+
+  .email {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  /* A small pill-shaped Copy button next to the address */
+  .copy {
+    padding: 0.1rem var(--space-2);
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent);
+    color: var(--color-text);
+    font: 600 0.8rem var(--font-heading);
+    cursor: pointer;
   }
 </style>

@@ -14,7 +14,35 @@ import { url } from '../utils/url';
     {places.map((p) => (
       <li>
         <a class="card" href={url(`${p.id}/`)} style={`--tint: ${p.tint}; --accent: ${p.accent}`}>
-          <span class:list={['icon', { vinyl: p.vinyl }]} aria-hidden="true"></span>
+          {/* A little drawing of what each building is for (40 × 40 grid) */}
+          <svg class="icon" viewBox="0 0 40 40" aria-hidden="true">
+            {p.id === 'workshop' && (
+              /* a wrench, tilted: handle, round head, and an open jaw */
+              <g transform="rotate(-45 20 20)">
+                <rect class="ink" x="1" y="15" width="25" height="10" rx="5" />
+                <circle class="ink" cx="28" cy="20" r="10.5" />
+                <rect class="cutout" x="30" y="16" width="11" height="8" rx="2" />
+                <circle class="cutout" cx="6" cy="20" r="2.2" />
+              </g>
+            )}
+            {p.id === 'experience' && (
+              /* the Town Hall's clock, like the one on its roof */
+              <g>
+                <circle class="clock-face" cx="20" cy="20" r="16" />
+                <path class="clock-hands" d="M20 20 L13 15 M20 20 L27 12" />
+                <circle class="clock-pin" cx="20" cy="20" r="2.2" />
+              </g>
+            )}
+            {p.id === 'record-shop' && (
+              /* a record: dark disc, a groove, a yellow label, a center hole */
+              <g>
+                <circle class="disc" cx="20" cy="20" r="18" />
+                <circle class="groove" cx="20" cy="20" r="12.5" />
+                <circle class="label" cx="20" cy="20" r="6.5" />
+                <circle class="cutout" cx="20" cy="20" r="1.6" />
+              </g>
+            )}
+          </svg>
           <span class="title">{p.name}</span>
           <span class="text">{p.menuLine}</span>
         </a>
@@ -35,7 +63,7 @@ import { url } from '../utils/url';
   }
 
   /* auto-fit + minmax: as many 14rem-wide columns as fit, sharing the space.
-     Four across on a laptop, two on a tablet, one on a phone, no media queries. */
+     Three across on a laptop, one on a phone, no media queries. */
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
@@ -63,18 +91,21 @@ import { url } from '../utils/url';
   }
 
   .icon {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2.75rem;
+    height: 2.75rem;
     margin-bottom: var(--space-2);
-    background: var(--accent);
-    border-radius: var(--radius-sm);
   }
 
-  /* The Record Shop's icon is a little record: dark circle, yellow middle */
-  .icon.vinyl {
-    border-radius: 50%;
-    background: radial-gradient(var(--color-accent) 0 22%, var(--color-vinyl) 24%);
-  }
+  /* Icon colors. "cutout" uses the card's own background, so it looks
+     like a hole (the wrench's jaw, the record's center). */
+  .ink { fill: var(--accent); }
+  .cutout { fill: var(--tint); }
+  .clock-face { fill: var(--color-wall); stroke: var(--color-star); stroke-width: 3.5; }
+  .clock-hands { fill: none; stroke: var(--color-text); stroke-width: 3; stroke-linecap: round; }
+  .clock-pin { fill: var(--color-text); }
+  .disc { fill: var(--color-vinyl); }
+  .groove { fill: none; stroke: var(--color-text-muted); stroke-width: 1; }
+  .label { fill: var(--color-accent); }
 
   .title {
     font-family: var(--font-heading);
