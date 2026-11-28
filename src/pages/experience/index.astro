@@ -9,6 +9,7 @@ import SiteHeader from '../../components/SiteHeader.astro';
 import CherryEngineer from '../../components/CherryEngineer.astro';
 import { url } from '../../utils/url';
 import { coursework } from '../../data/coursework';
+import { awards } from '../../data/awards';
 
 // Newest first. "2026-08" > "2026-01" works as plain text comparison
 // because every date has the same YYYY-MM shape.
@@ -64,6 +65,20 @@ const labels = { research: 'Research', work: 'Work', program: 'Program', leaders
           </ul>
         </div>
       ))}
+    </section>
+
+    <section class="awards" aria-labelledby="awards-title">
+      <h2 id="awards-title">Awards & certifications</h2>
+      <ul>
+        {awards.map((a) => (
+          <li>
+            <span class="award-icon" aria-hidden="true">★</span>
+            <span>
+              <strong>{a.name}</strong>, {a.from} <span class="award-when">· {a.when}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
     </section>
 
     <h2>Experience</h2>
@@ -129,6 +144,29 @@ const labels = { research: 'Research', work: 'Work', program: 'Program', leaders
   }
 
   h2 { font-size: 1.75rem; }
+
+  /* Awards: a short list, each with a little gold star */
+  .awards {
+    margin-bottom: var(--space-5);
+  }
+  .awards ul {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .awards li {
+    display: flex;
+    gap: var(--space-2);
+    align-items: baseline;
+  }
+  .award-icon {
+    color: var(--color-star);
+  }
+  .award-when {
+    color: var(--color-text-muted);
+  }
 
   /* Coursework: one row of soft yellow pills per school */
   .coursework {

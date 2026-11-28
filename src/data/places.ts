@@ -4,7 +4,7 @@
  * pages, so a name or description only ever changes here.
  */
 export interface Place {
-  id: 'workshop' | 'gallery' | 'experience' | 'record-shop' | 'lookout';
+  id: 'workshop' | 'experience' | 'record-shop' | 'lookout';
   name: string;
   line: string;      // what the speech bubble says
   menuLine: string;  // shorter text for the "Where to?" card
@@ -26,26 +26,12 @@ export const places: Place[] = [
     name: 'Workshop',
     line: 'Technical projects: embedded systems, hardware builds and ML work, each with a write-up, photos and code.',
     menuLine: 'Technical projects: embedded, hardware, ML.',
-    x: 185,
+    x: 400,
     kind: 'house',
     roof: 'var(--color-workshop)',
     roofDark: 'var(--color-workshop-dark)',
     accent: 'var(--color-workshop)',
     tint: 'var(--color-workshop-tint)',
-  },
-  {
-    id: 'gallery',
-    name: 'Gallery',
-    line: "Art I've made, from sketches to finished pieces.",
-    menuLine: "Art I've made.",
-    x: 432,
-    kind: 'house',
-    roof: 'var(--color-gallery)',
-    roofDark: 'var(--color-gallery-dark)',
-    accent: 'var(--color-gallery)',
-    tint: 'var(--color-gallery-tint)',
-    door: 'var(--color-gallery-dark)',
-    windows: ['var(--color-recordshop)', 'var(--color-lookout)'],
   },
   {
     id: 'experience',
@@ -67,7 +53,7 @@ export const places: Place[] = [
     name: 'Record Shop',
     line: "Albums I'm rating, what I'm listening to right now, and a short take on each.",
     menuLine: "Albums I'm rating and what I'm listening to.",
-    x: 964,
+    x: 996,
     kind: 'house',
     roof: 'var(--color-recordshop)',
     roofDark: 'var(--color-recordshop-dark)',
@@ -82,7 +68,7 @@ export const places: Place[] = [
     name: 'Lookout',
     line: "Photography and places I've been, pinned on a map.",
     menuLine: "Photography and places I've been, pinned on a map.",
-    x: 1225,
+    x: 1240,
     kind: 'lighthouse',
     roof: 'var(--color-recordshop)',
     roofDark: 'var(--color-recordshop-dark)',
