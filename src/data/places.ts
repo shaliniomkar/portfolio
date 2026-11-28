@@ -4,7 +4,7 @@
  * pages, so a name or description only ever changes here.
  */
 export interface Place {
-  id: 'workshop' | 'experience' | 'record-shop' | 'lookout';
+  id: 'workshop' | 'experience' | 'record-shop';
   name: string;
   line: string;      // what the speech bubble says
   menuLine: string;  // shorter text for the "Where to?" card
@@ -62,18 +62,6 @@ export const places: Place[] = [
     door: 'var(--color-recordshop-dark)',
     windows: ['var(--color-sky)'],
     vinyl: true,
-  },
-  {
-    id: 'lookout',
-    name: 'Lookout',
-    line: "Photography and places I've been, pinned on a map.",
-    menuLine: "Photography and places I've been, pinned on a map.",
-    x: 1240,
-    kind: 'lighthouse',
-    roof: 'var(--color-recordshop)',
-    roofDark: 'var(--color-recordshop-dark)',
-    accent: 'var(--color-lookout)',
-    tint: 'var(--color-lookout-tint)',
   },
 ];
 
