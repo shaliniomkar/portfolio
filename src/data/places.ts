@@ -18,6 +18,7 @@ export interface Place {
   windows?: string[];
   vinyl?: boolean;   // record on the roof (Record Shop)
   clock?: boolean;   // clock on the roof (Town Hall)
+  wrench?: boolean;  // wrench on the roof (Workshop)
 }
 
 export const places: Place[] = [
@@ -32,6 +33,7 @@ export const places: Place[] = [
     roofDark: 'var(--color-workshop-dark)',
     accent: 'var(--color-workshop)',
     tint: 'var(--color-workshop-tint)',
+    wrench: true,
   },
   {
     id: 'experience',
@@ -69,7 +71,7 @@ export const places: Place[] = [
 export const GROUND = 469;
 
 /** How far above the ground a building's sign floats (negative = up). */
-export function signOffset(place: Pick<Place, 'kind' | 'vinyl' | 'clock'>): number {
+export function signOffset(place: Pick<Place, 'kind' | 'vinyl' | 'clock' | 'wrench'>): number {
   if (place.kind === 'lighthouse') return -275;
-  return place.vinyl || place.clock ? -238 : -205;
+  return place.vinyl || place.clock || place.wrench ? -238 : -205;
 }

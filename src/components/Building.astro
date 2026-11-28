@@ -21,6 +21,7 @@ interface Props {
   windows?: string[];         // two colors = two windows; one = one wide window
   vinyl?: boolean;            // record on the roof (Record Shop)
   clock?: boolean;            // clock on the roof (Town Hall)
+  wrench?: boolean;           // wrench on the roof (Workshop)
 }
 
 const {
@@ -35,11 +36,12 @@ const {
   windows = ['var(--color-window-glow)', 'var(--color-window-glow)'],
   vinyl = false,
   clock = false,
+  wrench = false,
 } = Astro.props;
 
 // How high the sign floats above the ground (shared with Island.astro,
 // which needs it to size the clickable area).
-const signY = signOffset({ kind, vinyl, clock });
+const signY = signOffset({ kind, vinyl, clock, wrench });
 // Rough width so the sign fits its text (about 9 units per letter + padding).
 const signWidth = name.length * 9 + 32;
 // With one wide window, the door moves right to make room.
@@ -73,6 +75,17 @@ const doorX = windows.length === 1 ? 50 : 0;
 
       {/* Door: straight sides with a half-circle (arc) on top */}
       <path class="door" d={`M${doorX - 20} -8 V-38 A20 20 0 0 1 ${doorX + 20} -38 V-8 Z`} />
+
+      {wrench && (
+        /* A big wrench standing on the roof, tilted like a sign. The open
+           jaw and the hole are sky-colored, so they look see-through. */
+        <g class="roof-wrench" transform="translate(0 -192) rotate(-45)">
+          <rect x="-30" y="-6.5" width="40" height="13" rx="6.5" class="wrench-metal" />
+          <circle cx="14" cy="0" r="16" class="wrench-metal" />
+          <rect x="16" y="-6" width="16" height="12" rx="3" class="wrench-gap" />
+          <circle cx="-23" cy="0" r="3" class="wrench-gap" />
+        </g>
+      )}
 
       {clock && (
         <g class="clock">
@@ -142,6 +155,8 @@ const doorX = windows.length === 1 ? 50 : 0;
     stroke-width: 4;
   }
   .vinyl-disc { fill: var(--color-vinyl); }
+  .wrench-metal { fill: var(--color-workshop-dark); }
+  .wrench-gap { fill: var(--color-sky); }
   .clock-face {
     fill: var(--color-wall);
     stroke: var(--color-star);
